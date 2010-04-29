@@ -53,7 +53,7 @@
 <tbody valign="top">
 <tr class="field"><th class="field-name">Release:</th><td class="field-body">0.5</td>
 </tr>
-<tr class="field"><th class="field-name">Date:</th><td class="field-body">April 27, 2010</td>
+<tr class="field"><th class="field-name">Date:</th><td class="field-body">April 29, 2010</td>
 </tr>
 </tbody>
 </table>
@@ -140,6 +140,49 @@ This is an example of a custom datacenter driver representing a colocation facil
 <p>The get_factory call will get the &#8216;sv3-001&#8217; rack instance from clusto and lookup an attribute of key=&#8217;rackfactory&#8217; to determine which factory class should be used to fill in the rest of the information. The __init__ method of Digg201001RackFactory also creates network, console, and power switch instances with names based on the name of the rack.</p>
 <p>The connect_ports method ensures that this rack is in the datacenter, that the network, console, and power instances are in this rack, and that their ports are all connected as intended. This gives us the basic structure of everything that will be identical across all racks with this layout.</p>
 </div>
+<div class="section" id="virtual-machines">
+<h2>Virtual machines<a class="headerlink" href="#virtual-machines" title="Permalink to this headline">¶</a></h2>
+<p>Clusto supports managing virtual machines and their host environments through subclasses of VMManager. At the time of writing the only working implementation is XenVMManager.</p>
+<p>Assuming you already have some server objects and you&#8217;ve installed Xen with libvirtd on those servers, with an LVM volume group named &#8220;vg0&#8221;, the clusto side of things goes a bit like this:</p>
+<div class="highlight-python"><pre>from clusto.drivers import XenVMManager, XenVirtualServer
+
+hosts = [
+       clusto.get_by_name('xenhost1')
+       clusto.get_by_name('xenhost2')
+       clusto.get_by_name('xenhost3')
+]
+
+# Every hypervisor MUST have the following four attributes set
+for x in hosts:
+       x.set_attr(key='xen', subkey='volume-group', value='vg0')   # LVM VG name
+       x.set_attr(key='system', subkey='memory', value=16384)      # RAM in MB
+       x.set_attr(key='system', subkey='disk', value=2000)         # Disk in GB
+       x.set_attr(key='system', subkey='cpucount', value=8)        # Logical CPUs
+
+manager = XenVMManager('xenmanager')
+[manager.insert(x) for x in hosts]</pre>
+</div>
+<p>Now that you have your host machines configured, allocate a new VM:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">vm</span> <span class="o">=</span> <span class="n">XenVirtualServer</span><span class="p">(</span><span class="s">&#39;xenvm1&#39;</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">bind_ip_to_osport</span><span class="p">(</span><span class="s">&#39;192.168.1.51&#39;</span><span class="p">,</span> <span class="s">&#39;eth0&#39;</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">set_port_attr</span><span class="p">(</span><span class="s">&#39;nic-eth&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="s">&#39;mac&#39;</span><span class="p">,</span> <span class="s">&#39;02:52:0a:00:00:01&#39;</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="n">subkey</span><span class="o">=</span><span class="s">&#39;memory&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1024</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="n">subkey</span><span class="o">=</span><span class="s">&#39;disk&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">20</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="n">subkey</span><span class="o">=</span><span class="s">&#39;cpucount&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">vm</span><span class="p">)</span>
+
+<span class="n">vm</span><span class="o">.</span><span class="n">vm_create</span><span class="p">()</span>         <span class="c"># Create the LVM logical volumes, define the domain</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">vm_start</span><span class="p">()</span>          <span class="c"># Start the defined domain</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">vm_console</span><span class="p">()</span>        <span class="c"># SSH to the host and open the VM&#39;s console</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">vm_stop</span><span class="p">()</span>           <span class="c"># Shutdown the VM</span>
+</pre></div>
+</div>
+<p>If you already have IPManager and SimpleEntityNameManager instances setup, the command line tools should work as well:</p>
+<div class="highlight-python"><pre>$ clusto vm create --disk 20 --memory 1024
+Created v1000
+$ clusto vm start v1000</pre>
+</div>
+</div>
 </div>
 
 
@@ -156,6 +199,7 @@ This is an example of a custom datacenter driver representing a colocation facil
 <li><a class="reference external" href="#creating-a-datacenter">Creating a datacenter</a></li>
 <li><a class="reference external" href="#adding-racks-to-the-datacenter">Adding racks to the datacenter</a></li>
 <li><a class="reference external" href="#rack-factory">Rack factory</a></li>
+<li><a class="reference external" href="#virtual-machines">Virtual machines</a></li>
 </ul>
 </li>
 </ul>
@@ -205,7 +249,7 @@ This is an example of a custom datacenter driver representing a colocation facil
     </div>
     <div class="footer">
       &copy; Copyright 2010, Digg, Inc..
-      Last updated on Apr 27, 2010.
+      Last updated on Apr 29, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
