@@ -53,7 +53,7 @@
 <tbody valign="top">
 <tr class="field"><th class="field-name">Release:</th><td class="field-body">0.5</td>
 </tr>
-<tr class="field"><th class="field-name">Date:</th><td class="field-body">May 05, 2010</td>
+<tr class="field"><th class="field-name">Date:</th><td class="field-body">May 06, 2010</td>
 </tr>
 </tbody>
 </table>
@@ -68,6 +68,14 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># aptitude update</span>
 <span class="c"># aptitude install clusto</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="building-an-rpm-package">
+<h3>Building an rpm package<a class="headerlink" href="#building-an-rpm-package" title="Permalink to this headline">¶</a></h3>
+<p>You may need to install rpmdevtools beforehand, or run the rpmbuild as root:</p>
+<div class="highlight-python"><pre>$ cd rpm/
+$ ./make_tarball.sh
+$ rpmbuild -ta clusto-$VERSION.tar.gz</pre>
 </div>
 </div>
 <div class="section" id="from-source">
@@ -135,6 +143,7 @@ dsn = mysql://clustouser:clustopass@127.0.0.1/clusto</pre>
 <li><a class="reference external" href="">Getting Started</a><ul>
 <li><a class="reference external" href="#installation">Installation</a><ul>
 <li><a class="reference external" href="#from-debian-package">From debian package</a></li>
+<li><a class="reference external" href="#building-an-rpm-package">Building an rpm package</a></li>
 <li><a class="reference external" href="#from-source">From source</a></li>
 </ul>
 </li>
@@ -193,7 +202,7 @@ dsn = mysql://clustouser:clustopass@127.0.0.1/clusto</pre>
     </div>
     <div class="footer">
       &copy; Copyright 2010, Digg, Inc..
-      Last updated on May 05, 2010.
+      Last updated on May 06, 2010.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
