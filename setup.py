@@ -17,15 +17,12 @@ setup(name = "clusto",
                           'IPython',
                           'PyYAML',
                           'python-memcached',
-<<<<<<< HEAD
                           'IPy',
                           'scapy',
                           'pcapy',
                           'WebOb',
-=======
                           'mako',
                           'boto'
->>>>>>> rongoro/feature/ec2support
                           ],
       zip_safe=False,
       package_dir = {'':'src'},
