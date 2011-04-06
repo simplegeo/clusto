@@ -5,15 +5,13 @@ eventlet.monkey_patch()
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import BasicServer, EC2Region, EC2Zone, Pool
-from clusto.services.config import conf
+from clusto.services.config import conf, get_logger
 import clusto
 
 import kombu
 
 from traceback import format_exc
-from pprint import pprint
 from time import sleep
-import sys
 
 QUEUE_HOSTS = conf('barker.hosts')
 QUEUE_EXCHANGE = conf('barker.exchange')
@@ -28,13 +26,15 @@ EC2_SUBKEYS = {
     'instance-type': 'type',
 }
 
+log = get_logger('clusto.barker', level='DEBUG')
+
 def barker_callback(body):
     if not 'ec2' in body:
         return
     if not 'instance-id' in body['ec2']:
         return
     ec2 = body['ec2']
-    print ec2['instance-id']
+    log.debug(ec2['instance-id'])
 
     try:
         clusto.begin_transaction()
@@ -90,11 +90,9 @@ def barker_callback(body):
 
         clusto.commit()
     except:
-        #pprint(ec2)
-        print ec2['local-ipv4']
-        print format_exc()
+        log.warning(ec2['local-ipv4'])
+        log.warning(format_exc())
         clusto.rollback_transaction()
-    #pprint(body)
 
 class BarkerConsumer(object):
     def __init__(self, queue):
@@ -118,7 +116,7 @@ class BarkerConsumer(object):
         ])
         consumer.consume()
 
-        sys.stderr.write('%s consumer running\n' % hostname)
+        log.info('%s consumer running' % hostname)
         while True:
             connection.drain_events()
 
