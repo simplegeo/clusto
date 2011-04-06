@@ -1,3 +1,15 @@
+clusto (0.5.32-4sg10) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * clusto-barker-consumer now supports multiple queue hosts with each
+    connection in an isolated greenlet.
+  * Update EC2 public IP ranges (source:
+    https://forums.aws.amazon.com/ann.jspa?annID=935)
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Apr 2011 20:12:23 +0000
+
 clusto (0.5.32-4sg9) lucid; urgency=low
 
   * UNRELEASED
