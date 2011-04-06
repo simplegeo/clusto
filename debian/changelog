@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg11) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Clean up barker consumer logging
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Apr 2011 20:37:04 +0000
+
 clusto (0.5.32-4sg10) lucid; urgency=low
 
   [ Jeremy Grosser ]
