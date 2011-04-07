@@ -11,7 +11,7 @@ import clusto
 import kombu
 
 from traceback import format_exc
-from time import sleep
+from time import sleep, time
 
 QUEUE_HOSTS = conf('barker.hosts')
 QUEUE_EXCHANGE = conf('barker.exchange')
@@ -87,6 +87,11 @@ def barker_callback(body):
             total_disk += disk['size']
         total_disk = total_disk / 1073741824
         server.set_attr(key='system', subkey='disk', value=total_disk)
+
+        for subkey, value in body.get('sgmetadata', {}).items():
+            server.set_attr(key='sgmetadata', subkey=subkey, value=value)
+
+        server.set_attr(key='barker', subkey='last_updated', value=int(time()))
 
         clusto.commit()
     except:
