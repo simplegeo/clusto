@@ -90,6 +90,9 @@ def barker_callback(body):
 
         for subkey, value in body.get('sgmetadata', {}).items():
             server.set_attr(key='sgmetadata', subkey=subkey, value=value)
+            if subkey == 'clusterid':
+                cluster = clusto.get_or_create(value, Pool)
+                cluster.insert(server)
 
         server.set_attr(key='barker', subkey='last_updated', value=int(time()))
 
