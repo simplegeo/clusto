@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg15) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Add /query/get endpoint
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 12 Apr 2011 21:31:30 +0000
+
 clusto (0.5.32-4sg14) lucid; urgency=low
 
   [ Jeremy Grosser ]
