@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg14) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Instantiate services.http.ClustoApp so we can use gunicorn
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 12 Apr 2011 17:32:05 +0000
+
 clusto (0.5.32-4sg13) lucid; urgency=low
 
   [ Paul Lathrop ]
