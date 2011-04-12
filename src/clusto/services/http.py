@@ -55,6 +55,19 @@ class EntityAPI(object):
         self.obj = obj
         self.url = '/%s/%s' % (self.obj.type, self.obj.name)
 
+    def _dict(self):
+        result = {}
+        result['object'] = self.url
+
+        attrs = []
+        for x in self.obj.attrs():
+            attrs.append(unclusto(x))
+        result['attrs'] = attrs
+        result['contents'] = [unclusto(x) for x in self.obj.contents()]
+        result['parents'] = [unclusto(x) for x in self.obj.parents()]
+        result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
+        return result
+
     def addattr(self, request):
         '''
         Add an attribute to this object.
@@ -123,18 +136,7 @@ class EntityAPI(object):
         '''
         Returns attributes and actions available for this object.
         '''
-        result = {}
-        result['object'] = self.url
-
-        attrs = []
-        for x in self.obj.attrs():
-            attrs.append(unclusto(x))
-        result['attrs'] = attrs
-        result['contents'] = [unclusto(x) for x in self.obj.contents()]
-        result['parents'] = [unclusto(x) for x in self.obj.parents()]
-        result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
-
-        return dumps(request, result)
+        return dumps(request, self._dict())
 
 class PortInfoAPI(EntityAPI):
     def ports(self, request):
@@ -238,6 +240,19 @@ class QueryAPI(object):
         obj = clusto.get_by_name(name)
         api = EntityAPI(obj)
         return api.show(request)
+
+    @classmethod
+    def get(self, request):
+        if not 'name' in request.params:
+            return Response(status=400, body='400 Bad Request\nYou must specify a "name" parameter\n')
+        name = request.params['name']
+        result = clusto.get(name)
+
+        if result is None:
+            return Response(status=404, body='404 Not Found\n')
+
+        result = [EntityAPI(x)._dict() for x in result]
+        return dumps(request, result)
 
     @classmethod
     def get_from_pools(self, request):
