@@ -10,6 +10,7 @@ from urllib import unquote_plus
 import new
 import re
 
+from clusto.scripthelpers import init_script
 from clusto.drivers import Driver, IPManager
 import clusto
 
@@ -410,3 +411,6 @@ class ClustoApp(object):
                 break
 
         return response(environ, start_response)
+
+init_script()
+application = ClustoApp()
