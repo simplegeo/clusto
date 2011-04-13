@@ -77,7 +77,6 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.add_attr(**kwargs)
-        clusto.commit()
         return self.show(request)
 
     def delattr(self, request):
@@ -87,7 +86,6 @@ class EntityAPI(object):
         Requires HTTP parameter "key"
         '''
         self.obj.del_attrs(request.params['key'])
-        clusto.commit()
         return self.show(request)
 
     def attrs(self, request):
@@ -114,7 +112,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device)
-        clusto.commit()
         return self.show(request)
 
     def remove(self, request):
@@ -129,7 +126,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.remove(device)
-        clusto.commit()
         return self.show(request)
 
     def show(self, request):
@@ -202,7 +198,6 @@ class RackAPI(EntityAPI):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
-        clusto.commit()
         return self.contents(request)
 
 class ResourceAPI(EntityAPI):
@@ -212,7 +207,6 @@ class ResourceAPI(EntityAPI):
         '''
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
-        clusto.commit()
         return dumps(request, unclusto(device), status=201)
 
 class QueryAPI(object):
@@ -370,7 +364,6 @@ class ClustoApp(object):
             return Response(status=404, body='404 Not Found\n')
 
         clusto.delete_entity(obj.entity)
-        clusto.commit()
         return Response(status=200, body='200 OK\nObject deleted\n')
 
     def get_action(self, request, match):
