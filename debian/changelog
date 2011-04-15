@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg20) lucid; urgency=low
+
+  [ Paul Lathrop ]
+  * The barker exchange should default to transient delivery.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 15 Apr 2011 18:47:26 +0000
+
 clusto (0.5.32-4sg19) lucid; urgency=low
 
   [ Jeremy Grosser ]
