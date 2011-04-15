@@ -118,7 +118,8 @@ class BarkerConsumer(object):
         message.ack()
 
     def __call__(self, hostname):
-        exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout')
+        exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout',
+                                  delivery_mode='transient')
         queue = kombu.Queue(QUEUE_NAME, exchange)
         connection = kombu.BrokerConnection(
             hostname=hostname,
