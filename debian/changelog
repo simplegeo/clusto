@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg21) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Add EC2 DNS names
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 21 Apr 2011 17:53:26 +0000
+
 clusto (0.5.32-4sg20) lucid; urgency=low
 
   [ Paul Lathrop ]
