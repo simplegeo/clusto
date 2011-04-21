@@ -24,6 +24,8 @@ EC2_SUBKEYS = {
     'ami-id': 'ami',
     'kernel-id': 'kernel',
     'instance-type': 'type',
+    'local-hostname': 'private-dns',
+    'public-hostname': 'public-dns',
 }
 
 log = get_logger('clusto.barker', level='DEBUG')
