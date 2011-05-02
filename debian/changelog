@@ -1,3 +1,14 @@
+clusto (0.5.32-4sg23) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * fix some missing attrs in clusto-barker-consumer
+  * HTTP caching
+  * symlinks make hulk angry
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Mon, 02 May 2011 18:40:16 +0000
+
 clusto (0.5.32-4sg21) lucid; urgency=low
 
   [ Jeremy Grosser ]
