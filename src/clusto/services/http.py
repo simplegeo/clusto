@@ -7,6 +7,7 @@ except ImportError:
 from webob import Request, Response
 from traceback import format_exc
 from urllib import unquote_plus
+import urllib2
 import new
 import re
 
@@ -16,6 +17,33 @@ import clusto
 
 from clusto.services.config import conf, get_logger
 log = get_logger('clusto.http', 'INFO')
+
+class VarnishRequest(urllib2.Request):
+    def __init__(self, *args, **kwargs):
+        if 'method' in kwargs:
+            self.method = kwargs['method']
+            del kwargs['method']
+        else:
+            self.method = 'GET'
+        urllib2.Request(self, *args, **kwargs)
+
+    def set_method(self, method):
+        self.method = method
+
+    def get_method(self):
+        return self.method
+    
+class VarnishCache(object):
+    def __init__(self, url):
+        self.url = url
+
+    def purge(self, path):
+        print 'PURGE', self.url + path
+        resp = urllib2.urlopen(VarnishRequest(self.url + path, method='PURGE'))
+        print repr(resp.info().__dict__)
+        return resp.info().status
+
+cache = VarnishCache('http://localhost:6082')
 
 def unclusto(obj):
     '''
@@ -36,7 +64,7 @@ def unclusto(obj):
         return '/%s/%s' % (obj.type, obj.name)
     return str(obj)
 
-def dumps(request, obj, **kwargs):
+def dumps(request, obj, cache=True, **kwargs):
     result = json.dumps(obj, indent=2, **kwargs)
     if 'callback' in request.params:
         callback = request.params['callback']
@@ -45,7 +73,15 @@ def dumps(request, obj, **kwargs):
     else:
         content_type = 'application/json'
 
-    return Response(result, content_type=content_type, **kwargs)
+    if cache:
+        cache = 'max-age=600'
+    else:
+        cache = 'no-cache'
+
+    return Response(result, headers={
+        'Content-type': content_type,
+        'Cache-control': cache,
+    }, **kwargs)
 
 def loads(request, obj):
     return json.loads(obj)
@@ -77,6 +113,7 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.add_attr(**kwargs)
+        cache.purge(self.obj.name)
         return self.show(request)
 
     def delattr(self, request):
@@ -87,6 +124,7 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.del_attrs(**kwargs)
+        cache.purge(self.obj.name)
         return self.show(request)
 
     def attrs(self, request):
@@ -113,6 +151,7 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device)
+        cache.purge(self.obj.name)
         return self.show(request)
 
     def remove(self, request):
@@ -127,6 +166,7 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.remove(device)
+        cache.purge(self.obj.name)
         return self.show(request)
 
     def show(self, request):
@@ -169,6 +209,7 @@ class PortInfoAPI(EntityAPI):
             return Response(status=400, body='portnum must be an integer\n')
 
         self.obj.set_port_attr(**kwargs)
+        cache.purge(self.obj.name)
         return Response(status=200)
 
     def get_port_attr(self, request):
@@ -199,6 +240,7 @@ class RackAPI(EntityAPI):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
+        cache.purge(self.obj.name)
         return self.contents(request)
 
 class ResourceAPI(EntityAPI):
@@ -208,6 +250,7 @@ class ResourceAPI(EntityAPI):
         '''
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
+        cache.purge(self.obj.name)
         return dumps(request, unclusto(device), status=201)
 
 class QueryAPI(object):
@@ -365,6 +408,7 @@ class ClustoApp(object):
             return Response(status=404, body='404 Not Found\n')
 
         clusto.delete_entity(obj.entity)
+        cache.purge(obj.name)
         return Response(status=200, body='200 OK\nObject deleted\n')
 
     def get_action(self, request, match):
