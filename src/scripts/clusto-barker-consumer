@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2.6
 from eventlet.queue import LightQueue as Queue
 import eventlet
 eventlet.monkey_patch()
@@ -53,7 +53,7 @@ def barker_callback(body):
         server.del_attrs(key='ec2')
 
         for key, subkey in EC2_SUBKEYS.items():
-            server.add_attr(key='ec2', subkey=subkey, value=ec2[key])
+            server.set_attr(key='ec2', subkey=subkey, value=ec2[key])
 
         for group in ec2['security-groups']:
             server.add_attr(key='ec2', subkey='security-group', value=group)
@@ -83,18 +83,19 @@ def barker_callback(body):
         total_disk = 0
         for i, disk in enumerate(system['disks']):
             for subkey in disk.keys():
-                server.add_attr(key='disk', subkey=subkey, number=i, value=str(disk[subkey]))
+                server.set_attr(key='disk', subkey=subkey, number=i, value=str(disk[subkey]))
             if disk['osname'] in blockmap:
-                server.add_attr(key='disk', subkey='ec2-type', number=i, value=blockmap[disk['osname']])
+                server.set_attr(key='disk', subkey='ec2-type', number=i, value=blockmap[disk['osname']])
             total_disk += disk['size']
         total_disk = total_disk / 1073741824
         server.set_attr(key='system', subkey='disk', value=total_disk)
 
         for subkey, value in body.get('sgmetadata', {}).items():
             server.set_attr(key='sgmetadata', subkey=subkey, value=value)
-            if subkey == 'clusterid':
+            if subkey == 'clusterid' and value:
                 cluster = clusto.get_or_create(value, Pool)
-                cluster.insert(server)
+                if not server in cluster:
+                    cluster.insert(server)
 
         server.set_attr(key='barker', subkey='last_updated', value=int(time()))
 
@@ -107,8 +108,7 @@ def barker_callback(body):
 
         clusto.commit()
     except:
-        log.warning(ec2['local-ipv4'])
-        log.warning(format_exc())
+        log.warning('Exception from %s: %s' % (ec2['instance-id'], format_exc()))
         clusto.rollback_transaction()
 
 class BarkerConsumer(object):

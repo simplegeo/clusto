@@ -2,10 +2,14 @@
 <head>
 	<title>Clusto Web</title>
 	<link rel="stylesheet" type="text/css" href="css/base.css" />
-	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
 	<script type="text/javascript">
 	//var apiurl = 'http://' + location.href.split('/').slice(2, 3) + ':9996';
 	var apiurl = '/api';
+	$.ajaxSetup({
+		cache: true,
+		dataType: 'json'
+	});
 
 	function break_str(s, breaklen) {
 		if(s.length < breaklen) {
@@ -53,7 +57,7 @@
 		if(query.length < 3) {
 			return;
 		}
-		$.getJSON(apiurl + '/search?callback=?', {'q': query}, function(data) {
+		$.getJSON(apiurl + '/search', {'q': query}, function(data) {
 			data.sort();
 			$('#search_results').html('')
 			exact = null;
@@ -85,7 +89,7 @@
 		lastnum = -1;
 		lastkey= "";
 		color = 0;
-		$.getJSON(apiurl + name + '/?format=json&callback=?', function(data) {
+		$.getJSON(apiurl + name + '/?format=json', function(data) {
 			$('#detail').html('<fieldset><legend>' + data['object'] + '</legend><ul class="attrs"></ul></fieldset><fieldset><legend>Contents</legend><ul class="contents"></ul></fieldset><fieldset><legend>Parents</legend><ul class="parents"></ul></fieldset><fieldset><legend>Actions</legend><ul class="actions"></ul></fieldset>');
 			data.attrs.sort(cmp_attrs);
 			$.each(data.attrs, function(i, attr) {
@@ -110,20 +114,20 @@
 			data.contents.sort();
 			$.each(data.contents, function(i, child) {
 				$('#detail .contents').append('<li><a href="#' + child.split('/').pop() + '" class="child" name="' + child + '">' + child + '</a></li>');
-				$('a[name=' + child + ']').click(item_detail);
+				$('a[name="' + child + '"]').click(item_detail);
 			});
 
 			data.parents.sort();
 			$.each(data.parents, function(i, p) {
 				$('#detail .parents').append('<li><a href="#' + p.split('/').pop() + '" class="parent" name="' + p + '">' + p + '</a></li>');
-				$('a[name=' + p + ']').click(item_detail);
+				$('a[name="' + p + '"]').click(item_detail);
 			});
 
 			data.actions.sort();
 			$.each(data.actions, function(i, action) {
 				aname = data['object'] + '/' + action;
 				$('#detail .actions').append('<li><a href="#" class="action" name="' + aname + '">' + action + '</a></li>');
-				$('a[name=' + aname + ']').click(item_action);
+				$('a[name="' + aname + '"]').click(item_action);
 			});
 		});
 	}
@@ -139,7 +143,7 @@
 		if($('#' + id + ' .item').length > 0) {
 			$('#' + id + ' .item').toggle();
 		}else{
-			$.getJSON(apiurl + '/' + type + '/?format=json&callback=?', function(items) {
+			$.getJSON(apiurl + '/' + type + '/?format=json', function(items) {
 				items.sort();
 				$.each(items, function(x, item) {
 					$('#' + id).append('<a class="item" href="#' + item.split('/').pop() + '" name="' + item + '">' + item.split('/')[2] + '</a>');
