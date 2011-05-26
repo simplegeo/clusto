@@ -127,6 +127,18 @@ class EntityAPI(object):
         cache.purge(self.obj.name)
         return self.show(request)
 
+    def setattr(self, request):
+        '''
+        Set an attribute on this object.
+
+        Requires HTTP parameters "key" and "value"
+        Optional parameters are "subkey" and "number"
+        '''
+        kwargs = dict(request.params.items())
+        self.obj.set_attr(**kwargs)
+        cache.purge(self.obj.name)
+        return self.show(request)
+
     def attrs(self, request):
         '''
         Query attributes from this object.
