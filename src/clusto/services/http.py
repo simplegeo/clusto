@@ -136,7 +136,6 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.set_attr(**kwargs)
-        cache.purge(self.obj.name)
         return self.show(request)
 
     def attrs(self, request):
