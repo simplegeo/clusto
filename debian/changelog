@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg27) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Forget about cache purging
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 26 May 2011 22:24:22 +0000
+
 clusto (0.5.32-4sg26) lucid; urgency=low
 
   [ Jeremy Grosser ]
