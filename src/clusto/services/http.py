@@ -18,32 +18,6 @@ import clusto
 from clusto.services.config import conf, get_logger
 log = get_logger('clusto.http', 'INFO')
 
-class VarnishRequest(urllib2.Request):
-    def __init__(self, *args, **kwargs):
-        if 'method' in kwargs:
-            self.method = kwargs['method']
-            del kwargs['method']
-        else:
-            self.method = 'GET'
-        urllib2.Request(self, *args, **kwargs)
-
-    def set_method(self, method):
-        self.method = method
-
-    def get_method(self):
-        return self.method
-    
-class VarnishCache(object):
-    def __init__(self, url):
-        self.url = url
-
-    def purge(self, path):
-        print 'PURGE', self.url + path
-        resp = urllib2.urlopen(VarnishRequest(self.url + path, method='PURGE'))
-        print repr(resp.info().__dict__)
-        return resp.info().status
-
-cache = VarnishCache('http://localhost:6082')
 
 def unclusto(obj):
     '''
@@ -94,6 +68,7 @@ class EntityAPI(object):
     def _dict(self):
         result = {}
         result['object'] = self.url
+        result['driver'] = self.obj.driver
 
         attrs = []
         for x in self.obj.attrs():
@@ -113,7 +88,6 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.add_attr(**kwargs)
-        cache.purge(self.obj.name)
         return self.show(request)
 
     def delattr(self, request):
@@ -124,7 +98,6 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.del_attrs(**kwargs)
-        cache.purge(self.obj.name)
         return self.show(request)
 
     def setattr(self, request):
@@ -162,7 +135,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device)
-        cache.purge(self.obj.name)
         return self.show(request)
 
     def remove(self, request):
@@ -177,7 +149,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.remove(device)
-        cache.purge(self.obj.name)
         return self.show(request)
 
     def show(self, request):
@@ -220,7 +191,6 @@ class PortInfoAPI(EntityAPI):
             return Response(status=400, body='portnum must be an integer\n')
 
         self.obj.set_port_attr(**kwargs)
-        cache.purge(self.obj.name)
         return Response(status=200)
 
     def get_port_attr(self, request):
@@ -251,7 +221,6 @@ class RackAPI(EntityAPI):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
-        cache.purge(self.obj.name)
         return self.contents(request)
 
 class ResourceAPI(EntityAPI):
@@ -261,7 +230,6 @@ class ResourceAPI(EntityAPI):
         '''
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
-        cache.purge(self.obj.name)
         return dumps(request, unclusto(device), status=201)
 
 class QueryAPI(object):
@@ -400,7 +368,7 @@ class ClustoApp(object):
                 return Response(status=409, body='409 Conflict\nObject already exists\n')
         except LookupError: pass
 
-        obj = clusto.typelist[objtype](objname)
+        obj = clusto.driverlist[objtype](objname)
 
         obj = EntityAPI(obj)
         response = obj.show(request)
@@ -419,7 +387,6 @@ class ClustoApp(object):
             return Response(status=404, body='404 Not Found\n')
 
         clusto.delete_entity(obj.entity)
-        cache.purge(obj.name)
         return Response(status=200, body='200 OK\nObject deleted\n')
 
     def get_action(self, request, match):
@@ -478,3 +445,9 @@ class ClustoApp(object):
 
 init_script()
 application = ClustoApp()
+
+if __name__ == '__main__':
+    from wsgiref.simple_server import make_server
+    server = make_server('0.0.0.0', 9996, application)
+    log.debug('clustohttp loaded')
+    server.serve_forever()
