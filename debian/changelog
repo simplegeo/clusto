@@ -1,3 +1,13 @@
+clusto (0.5.32-4sg28) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Remove varnish from http service, add driver to entity dump. Allow
+    ec2region and ec2zone to be created without args
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 27 May 2011 18:23:05 +0000
+
 clusto (0.5.32-4sg27) lucid; urgency=low
 
   [ Jeremy Grosser ]
