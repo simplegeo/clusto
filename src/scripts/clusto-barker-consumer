@@ -57,8 +57,8 @@ def barker_callback(body):
         for group in set(previous_ec2sg).difference(set(ec2['security-groups'])):
             server.del_attrs(key='ec2',subkey='security-group', value=group)
 
-        for group in ec2['security-groups']:
-            server.add_attr(key='ec2', subkey='security-group', value=group)
+        for i,group in enumerate(sorted(ec2['security-groups'])):
+            server.set_attr(key='ec2', subkey='security-group', number=i, value=group)
             if group.find('_') != -1:
                 environment, role = group.lower().split('_', 1)
                 p = clusto.get_or_create(environment, Pool)
