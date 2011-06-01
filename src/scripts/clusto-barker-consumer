@@ -50,10 +50,12 @@ def barker_callback(body):
         if not server in zone:
             zone.insert(server)
 
-        server.del_attrs(key='ec2')
-
         for key, subkey in EC2_SUBKEYS.items():
             server.set_attr(key='ec2', subkey=subkey, value=ec2[key])
+
+        previous_ec2sg = server.attr_values(key='ec2',subkey='security-group')
+        for group in set(previous_ec2sg).difference(set(ec2['security-groups'])):
+            server.del_attrs(key='ec2',subkey='security-group', value=group)
 
         for group in ec2['security-groups']:
             server.add_attr(key='ec2', subkey='security-group', value=group)
@@ -77,18 +79,24 @@ def barker_callback(body):
         server.set_attr(key='system', subkey='os',
                         value=system['operatingsystemrelease'])
 
-        server.del_attrs(key='disk')
+        previous_disk = server.attr_key_tuples(key='disk')
+        incoming_disk = []
         blockmap = [(v.replace('/dev/', ''), k) for k, v in ec2['block-device-mapping'].items() if k != 'root']
         blockmap = dict(blockmap)
         total_disk = 0
         for i, disk in enumerate(system['disks']):
             for subkey in disk.keys():
                 server.set_attr(key='disk', subkey=subkey, number=i, value=str(disk[subkey]))
+                incoming_disk.append(('disk',i,subkey))
             if disk['osname'] in blockmap:
                 server.set_attr(key='disk', subkey='ec2-type', number=i, value=blockmap[disk['osname']])
+                incoming_disk.append(('disk',i,'ec2-type'))
             total_disk += disk['size']
         total_disk = total_disk / 1073741824
         server.set_attr(key='system', subkey='disk', value=total_disk)
+
+        for attr in set(previous_disk).difference(set(incoming_disk)):
+            server.del_attrs(key=attr[0],subkey=attr[2],number=attr[1])
 
         for subkey, value in body.get('sgmetadata', {}).items():
             server.set_attr(key='sgmetadata', subkey=subkey, value=value)
