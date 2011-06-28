@@ -130,20 +130,27 @@ class BarkerConsumer(object):
         exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout',
                                   delivery_mode='transient')
         queue = kombu.Queue(QUEUE_NAME, exchange)
-        connection = kombu.BrokerConnection(
-            hostname=hostname,
-            userid=QUEUE_USER,
-            password=QUEUE_PASSWORD,
-            virtual_host=QUEUE_VHOST)
-        channel = connection.channel()
-        consumer = kombu.Consumer(channel, queue,
-                                  callbacks=[self.callback],
-                                  no_ack=True)
-        consumer.consume()
+        try:
+            connection = kombu.BrokerConnection(
+                hostname=hostname,
+                userid=QUEUE_USER,
+                password=QUEUE_PASSWORD,
+                virtual_host=QUEUE_VHOST)
+            channel = connection.channel()
+            consumer = kombu.Consumer(channel, queue,
+                                      callbacks=[self.callback],
+                                      no_ack=True)
+            consumer.consume()
 
-        log.info('%s consumer running' % hostname)
-        while True:
-            connection.drain_events()
+            log.info('%s consumer running' % hostname)
+            while True:
+                connection.drain_events()
+        except Exception, e:
+            log.error(format_exc())
+            raise e
+        finally:
+            if connection:
+                connection.release()
 
 def clusto_updater(queue):
     while True:
