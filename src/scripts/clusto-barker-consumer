@@ -124,6 +124,9 @@ class BarkerConsumer(object):
         self.queue = queue
 
     def callback(self, body, message):
+        if self.queue.qsize() > 100:
+            log.warning('Dropping message, queue size is over 100')
+            return
         self.queue.put(body)
 
     def __call__(self, hostname):
@@ -155,6 +158,7 @@ class BarkerConsumer(object):
 def clusto_updater(queue):
     while True:
         body = queue.get()
+        log.debug('Queue size %s' % queue.qsize())
         barker_callback(body)
 
 def main():
