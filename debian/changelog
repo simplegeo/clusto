@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg35) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Use a LIFO queue for the barker consumer, up to 500 messages
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 01 Jul 2011 17:13:05 +0000
+
 clusto (0.5.32-4sg34) maverick; urgency=low
 
   [ Jeremy Grosser ]
