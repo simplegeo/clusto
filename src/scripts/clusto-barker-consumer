@@ -1,5 +1,5 @@
 #!/usr/bin/python2.6
-from eventlet.queue import LightQueue as Queue
+from eventlet.queue import LifoQueue as Queue
 import eventlet
 eventlet.monkey_patch()
 
@@ -124,8 +124,8 @@ class BarkerConsumer(object):
         self.queue = queue
 
     def callback(self, body, message):
-        if self.queue.qsize() > 100:
-            log.warning('Dropping message, queue size is over 100')
+        if self.queue.qsize() > 500:
+            log.warning('Dropping message, queue size is over 500')
             return
         self.queue.put(body)
 
