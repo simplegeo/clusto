@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg37) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * New EC2 subnets
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Jul 2011 22:26:15 +0000
+
 clusto (0.5.32-4sg36) maverick; urgency=low
 
   [ Jeremy Grosser ]
