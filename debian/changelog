@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg36) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Don't set barker.last_updated attribute
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Jul 2011 21:28:34 +0000
+
 clusto (0.5.32-4sg35) maverick; urgency=low
 
   [ Jeremy Grosser ]
