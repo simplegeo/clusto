@@ -62,9 +62,13 @@ def barker_callback(body):
             if group.find('_') != -1:
                 environment, role = group.lower().split('_', 1)
                 p = clusto.get_or_create(environment, Pool)
+                if not p.attrs(key='pooltype', value='environment'):
+                    p.set_attr(key='pooltype', value='environment')
                 if not server in p:
                     p.insert(server)
                 p = clusto.get_or_create(role, Pool)
+                if not p.attrs(key='pooltype', value='role'):
+                    p.set_attr(key='pooltype', value='role')
                 if not server in p:
                     p.insert(server)
 
@@ -102,6 +106,8 @@ def barker_callback(body):
             server.set_attr(key='sgmetadata', subkey=subkey, value=value)
             if subkey == 'clusterid' and value:
                 cluster = clusto.get_or_create(value, Pool)
+                if not cluster.attrs(key='pooltype', value='clusterid'):
+                    cluster.set_attr(key='pooltype', value='clusterid')
                 if not server in cluster:
                     cluster.insert(server)
 
