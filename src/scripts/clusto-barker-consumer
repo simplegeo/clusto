@@ -110,6 +110,13 @@ def barker_callback(body):
                     cluster.set_attr(key='pooltype', value='clusterid')
                 if not server in cluster:
                     cluster.insert(server)
+            if subkey == 'role' and value:
+                server.set_attr(key='puppet', subkey='class',
+                                value='site::role::%s' % value)
+
+        if len(server.attr_values(key='puppet', subkey='class')) == 0:
+            server.set_attr(key='puppet', subkey='class',
+                            value='site::role::base')
 
         #server.set_attr(key='barker', subkey='last_updated', value=int(time()))
 
