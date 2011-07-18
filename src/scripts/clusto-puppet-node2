@@ -33,14 +33,14 @@ def main():
     disabled = False
 
     for attr in server.attrs(merge_container_attrs=True):
-        key = str(attr.key)        
+        key = str(attr.key)
         subkey = (attr.subkey != None) and str(attr.subkey) or None
 
         if isinstance(attr.value, int):
             value = int(attr.value)
         else:
             value = str(attr.value)
-            
+
         if subkey == 'disabled' and value:
             disabled = True
             break
@@ -55,7 +55,7 @@ def main():
                 continue
 
             if subkey not in result['parameters']:
-                resutl['parameters'][subkey] = value
+                result['parameters'][subkey] = value
 
             continue
 
@@ -63,7 +63,7 @@ def main():
         if subkey:
             paramname = paramname + '__' + subkey
 
-        if paramname not in result['parameters']:            
+        if paramname not in result['parameters']:
             result['parameters'][paramname] = value
 
     result['parameters']['pools'] = [str(p.name) for p in server.parents(clusto_types=['pool'])]
@@ -81,8 +81,8 @@ def main():
                     peers[str(ips[0])] = [str(x.name) for x in server.parents()]
 
     result['parameters']['peers'] = peers
-        
-        
+
+
     if disabled:
         result['classes'] = []
         result['parameters'] = {}
