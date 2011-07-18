@@ -1,3 +1,79 @@
+clusto (0.5.32-4sg38) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Add pooltype to generated pools
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Mon, 11 Jul 2011 20:43:51 +0000
+
+clusto (0.5.32-4sg37) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * New EC2 subnets
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Jul 2011 22:26:15 +0000
+
+clusto (0.5.32-4sg36) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Don't set barker.last_updated attribute
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 06 Jul 2011 21:28:34 +0000
+
+clusto (0.5.32-4sg35) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Use a LIFO queue for the barker consumer, up to 500 messages
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 01 Jul 2011 17:13:05 +0000
+
+clusto (0.5.32-4sg34) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Dirty hack to keep barker-consumer from running out of memory
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 29 Jun 2011 18:22:34 +0000
+
+clusto (0.5.32-4sg33) maverick; urgency=low
+
+  * UNRELEASED
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 28 Jun 2011 22:35:30 +0000
+
+clusto (0.5.32-4sg32) maverick; urgency=low
+
+  * UNRELEASED
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 28 Jun 2011 22:32:57 +0000
+
+clusto (0.5.32-4sg31) maverick; urgency=low
+
+  [ dsmith ]
+  * Close the connection if an exception is generated during the
+    consumption process
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 28 Jun 2011 22:30:25 +0000
+
+clusto (0.5.32-4sg30) lucid; urgency=low
+
+  [ Mike Newton ]
+  * change add_attr to set_attr and add number to security-group attrs
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 01 Jun 2011 19:47:37 +0000
+
 clusto (0.5.32-4sg29) lucid; urgency=low
 
   [ Mike Newton ]
