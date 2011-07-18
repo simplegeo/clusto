@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg40) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Fix typo.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Mon, 18 Jul 2011 20:54:52 +0000
+
 clusto (0.5.32-4sg39) maverick; urgency=low
 
   [ Paul Lathrop ]
