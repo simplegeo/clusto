@@ -134,8 +134,12 @@ def barker_callback(body):
         clusto.rollback_transaction()
 
 class BarkerConsumer(object):
+    max_retries = 10
+
     def __init__(self, queue):
         self.queue = queue
+        self.retry_count = 0
+        self.time_of_last_retry = 0
 
     def callback(self, body, message):
         if self.queue.qsize() > 500:
@@ -143,10 +147,10 @@ class BarkerConsumer(object):
             return
         self.queue.put(body)
 
-    def __call__(self, hostname):
+    def begin_consuming(self, hostname):
         exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout',
                                   delivery_mode='transient')
-        queue = kombu.Queue(QUEUE_NAME, exchange)
+        queue = kombu.Queue(QUEUE_NAME, exchange, auto_delete=True)
         try:
             connection = kombu.BrokerConnection(
                 hostname=hostname,
@@ -168,6 +172,21 @@ class BarkerConsumer(object):
         finally:
             if connection:
                 connection.release()
+
+    def __call__(self, hostname):
+        while True:
+            try:
+                self.begin_consuming(hostname)
+            except Exception, e:
+                self.retry_count += 1
+                if self.retry_count > self.max_retries:
+                    raise e
+
+                current_time = time()
+                if (current_time - self.time_of_last_retry) > 300:
+                    self.retry_count = 0
+
+                self.time_of_last_retry = current_time
 
 def clusto_updater(queue):
     while True:
