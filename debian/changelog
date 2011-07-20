@@ -1,3 +1,14 @@
+clusto (0.5.32-4sg41) maverick; urgency=low
+
+  [ dsmith ]
+  * barker queues should set auto_delete to remove messages from a queue
+    when no consumers are attached
+  * Retry when exceptions are generated
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 20 Jul 2011 17:16:52 +0000
+
 clusto (0.5.32-4sg40) maverick; urgency=low
 
   [ Paul Lathrop ]
