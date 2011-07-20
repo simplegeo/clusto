@@ -150,7 +150,7 @@ class BarkerConsumer(object):
     def begin_consuming(self, hostname):
         exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout',
                                   delivery_mode='transient')
-        queue = kombu.Queue(QUEUE_NAME, exchange)
+        queue = kombu.Queue(QUEUE_NAME, exchange, auto_delete=True)
         try:
             connection = kombu.BrokerConnection(
                 hostname=hostname,
