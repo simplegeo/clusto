@@ -161,7 +161,10 @@ class BarkerConsumer(object):
 
             log.info('%s consumer running' % hostname)
             while True:
-                connection.drain_events()
+                try:
+                    connection.drain_events()
+                except Exception, e:
+                    log.error(str(e))
         except Exception, e:
             log.error(format_exc())
             raise e
