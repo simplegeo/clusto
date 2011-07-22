@@ -1,3 +1,16 @@
+clusto (0.5.32-4sg42) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Revert "Retry when exceptions are generated" This reverts commit
+    dba8d2e9efeddd365b6923c51b45e0239a3dd9c5.
+  * Revert "barker queues should set auto_delete to remove messages from
+    a queue when no consumers are attached" This reverts commit
+    b35acf70294e1d9ecb4af00ed6f945659dc170e1.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 22 Jul 2011 22:11:49 +0000
+
 clusto (0.5.32-4sg41) maverick; urgency=low
 
   [ dsmith ]
