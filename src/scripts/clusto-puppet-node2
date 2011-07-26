@@ -23,6 +23,8 @@ def main():
 
     server = lookup(sys.argv[1])
     if not server:
+        server = lookup('default')
+    if not server:
         return -1
 
     result = {
