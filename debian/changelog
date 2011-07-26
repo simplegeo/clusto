@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg45) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Fall back to a 'default' object if a server object cannot be found.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 26 Jul 2011 22:21:38 +0000
+
 clusto (0.5.32-4sg44) maverick; urgency=low
 
   * UNRELEASED
