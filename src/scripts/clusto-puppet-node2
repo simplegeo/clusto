@@ -83,7 +83,7 @@ def main():
                     peers[str(ips[0])] = [str(x.name) for x in server.parents()]
 
     result['parameters']['peers'] = peers
-
+    result['parameters']['siblings'] = [str(sib.attr_value(key='ec2', subkey='public-dns')) for sib in server.siblings()]
 
     if disabled:
         result['classes'] = []
