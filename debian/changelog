@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg49) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Add --print-name option to print out the entity name.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 04 Aug 2011 21:07:51 +0000
+
 clusto (0.5.32-4sg48) maverick; urgency=low
 
   * UNRELEASED
