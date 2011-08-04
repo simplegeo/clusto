@@ -13,6 +13,7 @@ def main():
     parser = OptionParser(usage="usage: %prog [options] <pools...>")
     parser.add_option("-k", "--key", dest="key", default='ip')
     parser.add_option("-s", "--subkey", dest="subkey", default='ipstring')
+    parser.add_option("-n", "--print-name", action="store_true", dest="print_name", default=False)
     options, args = parser.parse_args()
 
     if not args:
@@ -20,7 +21,9 @@ def main():
         return -1
 
     for entity in clusto.get_from_pools(args):
-        print ' '.join(entity.attr_values(key=options.key, subkey=options.subkey))
+        name = [entity.name] if options.print_name else []
+        attrs = name + entity.attr_values(key=options.key, subkey=options.subkey)
+        print ' '.join(attrs)
 
 if __name__ == '__main__':
     sys.exit(main())
