@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg50) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Fix bug in get_from pools when results are empty.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 05 Aug 2011 17:03:41 +0000
+
 clusto (0.5.32-4sg49) maverick; urgency=low
 
   [ Paul Lathrop ]
