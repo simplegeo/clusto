@@ -181,7 +181,7 @@ def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=Tr
                                   search_children=search_children))
         resultsets.append(contents)
 
-    return reduce(set.intersection, resultsets)
+    return reduce(set.intersection, resultsets, set())
 
 def get_by_name(name):
     """Return the entity with the given name.
