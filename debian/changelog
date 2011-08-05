@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg51) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Better fix for the bug in get_from_pools that doesn't break things.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Fri, 05 Aug 2011 18:25:41 +0000
+
 clusto (0.5.32-4sg50) maverick; urgency=low
 
   [ Paul Lathrop ]
