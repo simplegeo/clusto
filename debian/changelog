@@ -1,3 +1,13 @@
+clusto (0.5.32-4sg54) maverick; urgency=low
+
+  [ mihasya ]
+  * store cpu info delivered by barker
+  * rename cpunum to cpucount
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 10 Aug 2011 17:31:58 +0000
+
 clusto (0.5.32-4sg53) maverick; urgency=low
 
   * UNRELEASED
