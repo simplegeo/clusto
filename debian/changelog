@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg56) maverick; urgency=low
+
+  [ mihasya ]
+  * store kernel release if barker offers it
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 10 Aug 2011 19:13:55 +0000
+
 clusto (0.5.32-4sg55) maverick; urgency=low
 
   [ Jeremy Grosser ]
