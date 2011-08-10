@@ -14,7 +14,7 @@ def generate_report(options, args):
     writer = csv.writer(sys.stdout)
     writer.writerow(['name', 'zone'] + keys)
     for entity in clusto.get_from_pools(args):
-        attrs = [entity.name, filter(lambda x: x.driver=='ec2zone', entity.parents())[0].name]
+        attrs = [entity.name, entity.parents(clusto_types=[clusto.drivers.EC2Zone])[0].name]
         for key in keys:
             k, sk = key.split('_', 1)
             attrs += [unicode(x).strip() for x in entity.attr_values(key=k, subkey=sk)]
