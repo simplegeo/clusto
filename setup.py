@@ -52,6 +52,7 @@ setup(name = "clusto",
                os.path.join(srcdir, 'scripts', 'clusto-vm'),
                os.path.join(srcdir, 'scripts', 'clusto-deallocate'),
                os.path.join(srcdir, 'scripts', 'clusto-update-db'),
+               os.path.join(srcdir, 'scripts', 'clusto-ec2-report'),
                ],
       test_suite = "clusto.test.alltests.gettests",
       dependency_links=['http://www.secdev.org/projects/scapy/']
