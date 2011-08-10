@@ -88,6 +88,10 @@ def barker_callback(body):
             server.set_attr(key='system', subkey='cpucount',
                             value=len(system['cpu']))
 
+        if 'kernelrelease' in system:
+            server.set_attr(key='system', subkey='kernelrelease',
+                            value=system['kernelrelease'])
+
         previous_disk = server.attr_key_tuples(key='disk')
         incoming_disk = []
         blockmap = [(v.replace('/dev/', ''), k) for k, v in ec2['block-device-mapping'].items() if k != 'root']
