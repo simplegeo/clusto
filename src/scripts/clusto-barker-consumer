@@ -85,7 +85,7 @@ def barker_callback(body):
         if 'cpu' in system and len(system['cpu'] > 0):
             server.set_attr(key='system', subkey='cputype',
                             value=system['cpu'][0]['model name'])
-            server.set_attr(key='system', subkey='cpunum',
+            server.set_attr(key='system', subkey='cpucount',
                             value=len(system['cpu']))
 
         previous_disk = server.attr_key_tuples(key='disk')
