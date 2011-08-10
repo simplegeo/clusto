@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+from clusto.scripthelpers import init_script
+from clusto.drivers import IPManager
+from clusto.drivers import servers
+import clusto
+
+from optparse import OptionParser
+import sys
+
+import csv
+
+def generate_report(options, args):
+    keys = options.keys.split(",")
+    writer = csv.writer(sys.stdout)
+    writer.writerow(['name', 'zone'] + keys)
+    for entity in clusto.get_from_pools(args):
+        attrs = [entity.name, filter(lambda x: x.driver=='ec2zone', entity.parents())[0].name]
+        for key in keys:
+            k, sk = key.split('_', 1)
+            attrs += [unicode(x).strip() for x in entity.attr_values(key=k, subkey=sk)]
+        writer.writerow(attrs)
+
+if __name__ == '__main__':
+    parser = OptionParser(
+        description="generate a csv of clusto values for a pool",
+        usage="usage: %prog [options] <pool1 pool2 ...>"
+    )
+    parser.add_option("-k", "--keys", dest="keys", help="Comma-delimited list of keys to report on")
+
+    options, args = parser.parse_args()
+
+    if not args:
+        print "Must supply at least one pool"
+        parser.print_help()
+        sys.exit(-1)
+
+    if not options.keys:
+        print "Must supply at least one key"
+        parser.print_help()
+        sys.exit(-1)
+
+    config, logger = init_script()
+    generate_report(options, args)
