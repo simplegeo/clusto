@@ -42,6 +42,9 @@ def barker_callback(body):
         clusto.begin_transaction()
         server = clusto.get_or_create(ec2['instance-id'], BasicServer)
 
+        if not clusto.attr_values(key='ec2', subkey='instance-id'):
+            clusto.set_attr(key='ec2', subkey='instance-id', value=ec2['instance-id'])
+
         zone = clusto.get(ec2['placement'])
         if not zone:
             zone = EC2Zone(ec2['placement'], placement=ec2['placement'])
