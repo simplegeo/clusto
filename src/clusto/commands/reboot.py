@@ -19,7 +19,7 @@ class Reboot(script_helper.Script):
 
     def _add_arguments(self, parser):
         parser.add_argument('object', nargs=1,
-            help='Server name or IP address')
+            help='Entity name, IP, or MAC address')
 
     def add_subparser(self, subparsers):
         parser = self._setup_subparser(subparsers)
@@ -33,12 +33,12 @@ class Reboot(script_helper.Script):
             self.error('"%s" does not exist' % args.object[0])
             return -1
         obj = obj[0]
-        if not isinstance(obj, drivers.BasicServer):
-            self.error('Seems like "%s" is not a server (type=%s), you cannot FAI this' % (args.object[0], obj.type))
+        if not hasattr(obj, 'reboot')
+            self.error('"%s" does not have a reboot() method.')
             return 1
-        self.debug('Working with %s' % obj)
+        self.debug('Rebooting %s' % obj)
         print 'Parents: %s' % ' '.join([ _.name for _ in obj.parents() ])
-        sys.stdout.write('Are you sure you want to reboot %s (yes/No)? ' % args.object[0])
+        sys.stdout.write('Are you sure you want to reboot %s (yes/no)? ' % args.object[0])
         sys.stdout.flush()
 
         try:
@@ -50,7 +50,7 @@ class Reboot(script_helper.Script):
             print 'Aborting'
             return
         else:
-            obj.power_reboot(captcha=False)
+            obj.reboot(captcha=False)
             print '%s is rebooting now.' % obj.name
         return
 
