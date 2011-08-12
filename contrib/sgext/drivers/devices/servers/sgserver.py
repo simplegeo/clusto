@@ -28,7 +28,7 @@ class SGServer(BasicServer):
                 return ip
             except Exception, e:
                 pass
-        ips = self.attr_values(key='ip', subkey='ipstring'):
+        ips = self.attr_values(key='ip', subkey='ipstring')
         for ip in ips:
             if IP(ip).iptype() != 'PRIVATE':
                 return ip
