@@ -90,6 +90,8 @@ def barker_callback(body):
                             value=system['cpu'][0]['model name'])
             server.set_attr(key='system', subkey='cpucount',
                             value=len(system['cpu']))
+            server.set_attr(key='system', subkey='cpucache',
+                            value=system['cpu'][0]['cache size'])
 
         if 'kernelrelease' in system:
             server.set_attr(key='system', subkey='kernelrelease',
