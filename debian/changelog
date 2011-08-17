@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg65) maverick; urgency=low
+
+  [ Mike Newton ]
+  * fix typo in instance-id section
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 17 Aug 2011 21:14:54 +0000
+
 clusto (0.5.32-4sg64) maverick; urgency=low
 
   [ Mike Newton ]
