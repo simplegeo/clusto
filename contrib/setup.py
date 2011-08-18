@@ -6,11 +6,5 @@ setup(name='clusto-sgext',
       install_requires=[
         'clusto',
         'IPy',
-        'paramiko',
         'boto',
-      ],
-      entry_points={
-        'console_scripts': [
-            'sg-shell = sgext.commands.shell:main',
-        ]
-      })
+      ])
