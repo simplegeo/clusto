@@ -2,6 +2,8 @@ from clusto.drivers.devices.servers.basicserver import BasicServer
 from IPy import IP
 import boto.ec2
 import paramiko
+import urllib2
+import socket
 import sys
 
 class IgnoreMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
@@ -48,3 +50,25 @@ class SGServer(BasicServer):
     def reboot(self):
         conn = self.get_boto_connection()
         conn.reboot_instances([self.attr_value(key='ec2', subkey='instance-id')])
+
+    def opsd_request(self, method, endpoint, data={}):
+        url = 'http://%s:9666/%s' % (self.get_best_ip(), endpoint)
+        if data:
+            req = urllib2.Request(url, data=data)
+        else:
+            req = urllib2.Request(url)
+        resp = urllib2.urlopen(req)
+        return json.loads(resp.read())
+
+    def start_service(self, name, provider='monit'):
+        result = self.opsd_request('POST', '/v0/service/%s/%s.json' % (provider, name), {'action': 'start'})
+        if result['status'] != 'ok':
+            raise SGException('Error starting service: %s' % result)
+
+    def stop_service(self, name, provider='monit'):
+        result = self.opsd_request('POST', '/v0/service/%s/%s.json' % (provider, name), {'action': 'stop'})
+        if result['status'] != 'ok':
+            raise SGException('Error starting service: %s' % result)
+
+    def get_service_status(self, name, provider='monit'):
+        return self.opsd_request('GET', '/v0/service/%s/%s.json' % (provider, name))

@@ -8,4 +8,9 @@ setup(name='clusto-sgext',
         'IPy',
         'paramiko',
         'boto',
-      ])
+      ],
+      entry_points={
+        'console_scripts': [
+            'sg-shell = sgext.commands.shell:main',
+        ]
+      })
