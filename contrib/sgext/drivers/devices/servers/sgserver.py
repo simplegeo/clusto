@@ -1,14 +1,10 @@
 from clusto.drivers.devices.servers.basicserver import BasicServer
 from IPy import IP
 import boto.ec2
-import paramiko
 import urllib2
 import socket
+import json
 import sys
-
-class IgnoreMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
-    def missing_host_key(self, client, hostname, key):
-        return
 
 class SGException(Exception):
     pass
@@ -37,22 +33,12 @@ class SGServer(BasicServer):
         if not ips:
             raise SGException('Unable to determine IP for %s' % self.name)
 
-    def ssh_command(self, command, timeout=0.0):
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(IgnoreMissingHostKeyPolicy)
-        client.connect(self.get_best_ip())
-        transport = client.get_transport()
-        session = transport.open_session()
-        session.settimeout(timeout)
-        returncode = session.recv_exit_status()
-        return returncode
-
     def reboot(self):
         conn = self.get_boto_connection()
         conn.reboot_instances([self.attr_value(key='ec2', subkey='instance-id')])
 
     def opsd_request(self, method, endpoint, data={}):
-        url = 'http://%s:9666/%s' % (self.get_best_ip(), endpoint)
+        url = 'http://%s:9666%s' % (self.get_best_ip(), endpoint)
         if data:
             req = urllib2.Request(url, data=data)
         else:
@@ -68,7 +54,34 @@ class SGServer(BasicServer):
     def stop_service(self, name, provider='monit'):
         result = self.opsd_request('POST', '/v0/service/%s/%s.json' % (provider, name), {'action': 'stop'})
         if result['status'] != 'ok':
-            raise SGException('Error starting service: %s' % result)
+            raise SGException('Error stopping service: %s' % result)
 
-    def get_service_status(self, name, provider='monit'):
-        return self.opsd_request('GET', '/v0/service/%s/%s.json' % (provider, name))
+    def restart_service(self, name, provider='monit'):
+        result = self.opsd_request('POST', '/v0/service/%s/%s.json' % (provider, name), {'action': 'restart'})
+        if result['status'] != 'ok':
+            raise SGException('Error restarting service: %s' % result)
+
+    def get_service_status(self, name=None, provider='monit'):
+        if name is None:
+            return self.opsd_request('GET', '/v0/service/%s/' % provider)
+        else:
+            return self.opsd_request('GET', '/v0/service/%s/%s.json' % (provider, name))
+
+    def install_package(self, name, provider='apt'):
+        result = self.opsd_request('POST', '/v0/package/%s/%s.json' % (provider, name), {'action': 'install'})
+        if result['status'] != 'ok':
+            raise SGException('Error installing package: %s' % result)
+
+    def remove_package(self, name, provider='apt'):
+        result = self.opsd_request('POST', '/v0/package/%s/%s.json' % (provider, name), {'action': 'remove'})
+        if result['status'] != 'ok':
+            raise SGException('Error removing package: %s' % result)
+
+    def apt_update(self):
+        return self.opsd_request('POST', '/v0/package/apt/update.json')
+
+    def get_package_status(self, name=None, provider='apt'):
+        if name is None:
+            return self.opsd_request('GET', '/v0/package/%s/' % provider)
+        else:
+            return self.opsd_request('GET', '/v0/package/%s/%s.json' % (provider, name))
