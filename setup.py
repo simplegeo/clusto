@@ -48,6 +48,8 @@ setuptools.setup(
         os.path.join(srcdir, 'scripts', 'clusto-tree'),
         os.path.join(srcdir, 'scripts', 'clusto-update-info'),
         os.path.join(srcdir, 'scripts', 'clusto-update-db'),
+        os.path.join(srcdir, 'scripts', 'clusto-ec2-report'),
+        os.path.join(srcdir, 'scripts', 'clusto-puppet-node2'),
       ],
       test_suite = "clusto.test.alltests.gettests",
 )
