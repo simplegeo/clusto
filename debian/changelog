@@ -1,3 +1,12 @@
+clusto (0.5.32-4sg67) maverick; urgency=low
+
+  [ Paul Lathrop ]
+  * Change short option for --print-name. Closes #18.
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Mon, 22 Aug 2011 18:54:20 +0000
+
 clusto (0.5.32-4sg66) maverick; urgency=low
 
   [ Paul Lathrop ]
