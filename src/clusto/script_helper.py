@@ -198,7 +198,7 @@ def load_config(filename, dsn=None, logger=None):
 
     plugins = []
     if config.has_option('clusto', 'plugins'):
-        plugins += clusto.get('clusto', 'plugins').split(',')
+        plugins += config.get('clusto', 'plugins').split(',')
     if 'CLUSTOPLUGINS' in os.environ:
         plugins += os.environ['CLUSTOPLUGINS'].split(',')
     for plugin in plugins:
