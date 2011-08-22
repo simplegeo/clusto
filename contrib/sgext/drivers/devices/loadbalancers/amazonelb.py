@@ -9,7 +9,7 @@ class AmazonELB(BasicAppliance):
         self.set_attr(key='elb', subkey='name', value='elbname')
 
     def get_boto_connection(self):
-        region = self.attr_value(key='ec2', subkey='region', merge_container_values=True)
+        region = self.attr_value(key='ec2', subkey='region', merge_container_attrs=True)
         return boto.ec2.elb.connect_to_region(region)
 
     def enable_zone(self, name_or_entity):
