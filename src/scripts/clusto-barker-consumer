@@ -70,7 +70,7 @@ def barker_callback(body):
                 if not server in p:
                     p.insert(server)
                 p = clusto.get_or_create(role, Pool)
-                if not p.attrs(key='pooltype', value='role'):
+                if p.name != 'all' and not p.attrs(key='pooltype', value='role'):
                     p.set_attr(key='pooltype', value='role')
                 if not server in p:
                     p.insert(server)
