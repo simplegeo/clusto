@@ -38,6 +38,8 @@ setuptools.setup(
             'clusto-pool = clusto.commands.pool:main',
             'clusto-reboot = clusto.commands.reboot:main',
             'clusto-shell = clusto.commands.shell:main',
+            'clusto-initdb = clusto.commands.initdb:main',
+            'clusto-httpd = clusto.commands.httpd:main',
         ],
     },
     zip_safe = False,
@@ -46,7 +48,6 @@ setuptools.setup(
         os.path.join(srcdir, 'scripts', 'clusto-tree'),
         os.path.join(srcdir, 'scripts', 'clusto-update-info'),
         os.path.join(srcdir, 'scripts', 'clusto-update-db'),
-        os.path.join(srcdir, 'scripts', 'clusto-httpd'),
       ],
       test_suite = "clusto.test.alltests.gettests",
 )
