@@ -7,14 +7,8 @@ except ImportError:
 from webob import Request, Response
 from traceback import format_exc
 from urllib import unquote_plus
-<<<<<<< HEAD
-import urllib2
-=======
->>>>>>> origin/merge
-import new
 import re
 
-from clusto.scripthelpers import init_script
 from clusto.drivers import Driver, IPManager
 import clusto
 
