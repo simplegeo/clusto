@@ -8,7 +8,7 @@ setup(name='clusto-sgext',
         'IPy',
         'boto',
         'kombu',
-        'eventlet'
+        'eventlet',
         'PyYAML',
       ], scripts=[
         'sgext/scripts/clusto-barker-consumer',
