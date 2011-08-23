@@ -2,9 +2,9 @@ from clusto.schema import *
 from clusto.exceptions import *
 
 from clusto.drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta, IPManager
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import create_engine
-from sqlalchemy.pool import SingletonThreadPool 
+from sqlalchemy.pool import SingletonThreadPool
 
 from clusto import drivers
 
@@ -26,11 +26,15 @@ def connect(config, echo=False):
 
     @param config: the config object
     """
+
     SESSION.configure(bind=create_engine(config.get('clusto', 'dsn'),
                                          echo=echo,
                                          poolclass=SingletonThreadPool,
                                          pool_recycle=600
                                          ))
+
+    SESSION.clusto_version = None
+
     try:
         memcache_servers = config.get('clusto', 'memcached').split(',')
 #       Memcache should only be imported if we're actually using it, yes?
@@ -72,6 +76,9 @@ def clear():
     """Clear the changes made to objects in the current session. """
 
     SESSION.expunge_all()
+    if hasattr(SESSION(), "TRANSACTIONCOUNTER"):
+      del SESSION().TRANSACTIONCOUNTER
+
 
 def get_driver_name(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
@@ -186,11 +193,12 @@ def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=Tr
     else:
         return set()
 
-def get_by_name(name):
+def get_by_name(name, assert_driver=None):
     """Return the entity with the given name.
 
     parameters:
       name - string; the name of the entity
+      assert_driver - class; driver class you want to assert this object as
     """
 
     name = u'%s' % name
@@ -199,6 +207,10 @@ def get_by_name(name):
         entity = Entity.query().filter_by(name=name).one()
 
         retval = Driver(entity)
+
+        if assert_driver:
+            if not isinstance(retval, assert_driver):
+                raise TypeError("The object %s is not an instance of %s" % (name, assert_driver))
 
         return retval
     except InvalidRequestError:
@@ -210,12 +222,14 @@ def get_by_names(names):
 
     This will return the entities in the same order as the passed argument,
     placing None in the slot with names that don't exist.
-    
+
     parameters:
-      name - list of strings; names of the entities
+      names - list of strings; names of the entities
     """
 
-    entities = Entity.query().filter(Entity.name.in_(names)).all()
+    unicode_names = [unicode(name) for name in names]
+
+    entities = Entity.query().filter(Entity.name.in_(unicode_names)).all()
 
     retvals = [None for x in xrange(len(names))]
 
@@ -227,7 +241,7 @@ def get_by_names(names):
 
     return retvals
 
-    
+
 get_by_attr = drivers.base.Driver.get_by_attr
 
 def get_or_create(name, driver, **kwargs):
@@ -321,13 +335,13 @@ def get_latest_version_number():
     return val
 
 
-def _check_transaction_counter():
+def _check_transaction_counter(not_zero=False):
     tl = SESSION()
 
     if not hasattr(tl, 'TRANSACTIONCOUNTER'):
         raise TransactionException("No transaction counter.  Outside of a transaction.")
 
-    if tl.TRANSACTIONCOUNTER < 0:
+    if tl.TRANSACTIONCOUNTER < 0 or (tl.TRANSACTIONCOUNTER == 0 and not_zero):
         raise TransactionException("Negative transaction counter!  SHOULD NEVER HAPPEN!")
 
 def _init_transaction_counter():
@@ -375,12 +389,18 @@ def rollback_transaction():
     """Rollback a transaction"""
 
     tl = SESSION()
-    _check_transaction_counter()
+
+    try:
+      _check_transaction_counter(not_zero=True)
+    except TransactionException, x:
+      raise TransactionException("Can't rollback, no transaction started.")
+
     if SESSION.is_active:
         SESSION.rollback()
         _dec_transaction_counter()
     else:
         _dec_transaction_counter()
+
 
 def change_driver(thingname, newdriver):
     """Change the Driver of a given Entity

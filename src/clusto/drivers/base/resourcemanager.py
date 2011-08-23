@@ -177,7 +177,7 @@ class ResourceManager(Driver):
             clusto.commit()
         except Exception, x:
             clusto.rollback_transaction()
-            raise x
+            raise
 
         if auto_allocated:
             self.post_automatic_allocation(thing, resource, number)

@@ -5,7 +5,9 @@ import clusto
 from clusto.schema import *
 from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter, Pool, BasicServer, IPManager
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
+from clusto.exceptions import TransactionException
+
 
 class TestClustoPlain(testbase.ClustoTestBase):
 
@@ -38,7 +40,7 @@ class TestClusto(testbase.ClustoTestBase):
 
     def testGetByName(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
 
         q = clusto.get_by_name('e1')
 
@@ -65,9 +67,9 @@ class TestClusto(testbase.ClustoTestBase):
 
         q = Entity.query()
 
-        self.assertEqual(q.filter_by(name='e1').count(), 0)
+        self.assertEqual(q.filter_by(name=u'e1').count(), 0)
 
-        self.assertEqual(q.filter_by(name='f1').count(), 1)
+        self.assertEqual(q.filter_by(name=u'f1').count(), 1)
 
 
     def testChangeDriver(self):
@@ -90,6 +92,19 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual(d.attr_value('foo'), 1)
 
+
+    def testBadRollback(self):
+
+        clusto.begin_transaction()
+
+        d1 = Entity('d1')
+
+        clusto.get_by_name('d1')
+
+        d2 = Entity('d2')
+        clusto.commit()
+
+        self.assertRaises(TransactionException, clusto.rollback_transaction)
 
     def testTransactionRollback(self):
 
@@ -294,7 +309,7 @@ class TestClusto(testbase.ClustoTestBase):
 
     def testDeleteEntity(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
 
         d = Driver(e1)
 
