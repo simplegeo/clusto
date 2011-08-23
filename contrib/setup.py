@@ -7,4 +7,11 @@ setup(name='clusto-sgext',
         'clusto',
         'IPy',
         'boto',
+        'kombu',
+        'eventlet'
+        'PyYAML',
+      ], scripts=[
+        'sgext/scripts/clusto-barker-consumer',
+        'sgext/scripts/clusto-puppet-node2',
+        'sgext/scripts/clusto-ec2-report',
       ])
