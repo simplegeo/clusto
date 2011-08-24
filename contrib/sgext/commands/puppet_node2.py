@@ -1,100 +1,108 @@
 #!/usr/bin/env python
-from clusto.scripthelpers import init_script
+from clusto import script_helper
 import clusto
 import yaml
-import sgext
-
-import simplejson
 import sys
 
-def lookup(name):
-    try:
-        server = clusto.get_by_name(name)
-        return server
-    except LookupError:
+import sgext
+
+class PuppetNode2(script_helper.Script):
+    def lookup(self, name):
         try:
-            server = clusto.get_by_name(name.split('.', 1)[0])
+            server = clusto.get_by_name(name)
             return server
         except LookupError:
-            return False
+            try:
+                server = clusto.get_by_name(name.split('.', 1)[0])
+                return server
+            except LookupError:
+                return False
 
-def main():
-    if len(sys.argv) < 2:
-        return -1
+    def run(self, args):
+        server = self.lookup(args.hostname)
+        if not server:
+            server = self.lookup('default')
+        if not server:
+            return -1
 
-    server = lookup(sys.argv[1])
-    if not server:
-        server = lookup('default')
-    if not server:
-        return -1
+        result = {
+            'classes': [],
+            'parameters': {},
+        }
 
-    result = {
-        'classes': [],
-        'parameters': {},
-    }
+        disabled = False
 
-    disabled = False
+        for attr in server.attrs(merge_container_attrs=True):
+            key = str(attr.key)
+            subkey = (attr.subkey != None) and str(attr.subkey) or None
 
-    for attr in server.attrs(merge_container_attrs=True):
-        key = str(attr.key)
-        subkey = (attr.subkey != None) and str(attr.subkey) or None
+            if isinstance(attr.value, int):
+                value = int(attr.value)
+            else:
+                value = str(attr.value)
 
-        if isinstance(attr.value, int):
-            value = int(attr.value)
-        else:
-            value = str(attr.value)
+            if subkey == 'disabled' and value:
+                disabled = True
+                break
 
-        if subkey == 'disabled' and value:
-            disabled = True
-            break
+            if key == 'puppet':
+                if subkey == 'environment' and not 'environment' in result:
+                    result['environment'] = value
 
-        if key == 'puppet':
-            if subkey == 'environment' and not 'environment' in result:
-                result['environment'] = value
+                if subkey == 'class':
+                    if value not in result['classes']:
+                        result['classes'].append(value)
+                    continue
 
-            if subkey == 'class':
-                if value not in result['classes']:
-                    result['classes'].append(value)
+                if subkey not in result['parameters']:
+                    result['parameters'][subkey] = value
+
                 continue
 
-            if subkey not in result['parameters']:
-                result['parameters'][subkey] = value
+            paramname = '%s__%s' % ('clusto', key)
+            if subkey:
+                paramname = paramname + '__' + subkey
 
-            continue
+            if paramname not in result['parameters']:
+                result['parameters'][paramname] = value
 
-        paramname = '%s__%s' % ('clusto', key)
-        if subkey:
-            paramname = paramname + '__' + subkey
+        result['parameters']['pools'] = [str(p.name) for p in server.parents(clusto_types=['pool'])]
+    
+        clusters = [p for p in server.parents(clusto_types=['pool']) if p.attr_values('pooltype', value='cluster')]
 
-        if paramname not in result['parameters']:
-            result['parameters'][paramname] = value
+        peers = {}
+        for c in clusters:
+            servers = c.contents(search_children=True, clusto_types=['server', 'virtualserver'])
 
-    result['parameters']['pools'] = [str(p.name) for p in server.parents(clusto_types=['pool'])]
+            for server in servers:
+                if server not in peers:
+                    ips = server.get_ips()
+                    if ips:
+                        peers[str(ips[0])] = [str(x.name) for x in server.parents()]
 
-    clusters = [p for p in server.parents(clusto_types=['pool']) if p.attr_values('pooltype', value='cluster')]
+        result['parameters']['peers'] = peers
+        result['parameters']['siblings'] = [str(sib.attr_value(key='ec2', subkey='public-dns')) for sib in server.siblings()]
 
-    peers = {}
-    for c in clusters:
-        servers = c.contents(search_children=True, clusto_types=['server', 'virtualserver'])
+        if disabled:
+            result['classes'] = []
+            result['parameters'] = {}
 
-        for server in servers:
-            if server not in peers:
-                ips = server.get_ips()
-                if ips:
-                    peers[str(ips[0])] = [str(x.name) for x in server.parents()]
+        if not [x for x in result.values() if x]:
+            return -1
 
-    result['parameters']['peers'] = peers
-    result['parameters']['siblings'] = [str(sib.attr_value(key='ec2', subkey='public-dns')) for sib in server.siblings()]
+        yaml.dump(result, sys.stdout, default_flow_style=False, explicit_start=True, indent=2)
 
-    if disabled:
-        result['classes'] = []
-        result['parameters'] = {}
+    def _add_arguments(self, parser):
+        parser.add_argument('hostname')
 
-    if not [x for x in result.values() if x]:
-        return -1
+    def add_subparser(self, subparsers):
+        parser = self._setup_subparser(subparsers)
+        self._add_arguments(parser)
 
-    yaml.dump(result, sys.stdout, default_flow_style=False, explicit_start=True, indent=2)
+
+def main():
+    puppet_node2, args = script_helper.init_arguments(PuppetNode2)
+    return puppet_node2.run(args)
 
 if __name__ == '__main__':
-    init_script()
     sys.exit(main())
