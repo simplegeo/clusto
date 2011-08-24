@@ -3,7 +3,7 @@ from eventlet.queue import LifoQueue as Queue
 import eventlet
 eventlet.monkey_patch()
 
-from clusto.scripthelpers import init_script
+from clusto import script_helper
 from sgext.drivers import SGServer, EC2Zone
 from clusto.drivers import Pool
 from clusto.services.config import conf, get_logger
@@ -15,6 +15,7 @@ import kombu
 from traceback import format_exc
 from time import sleep, time
 import logging
+import sys
 
 QUEUE_HOSTS = conf('barker.hosts')
 QUEUE_EXCHANGE = conf('barker.exchange')
@@ -153,9 +154,10 @@ def barker_callback(body):
         log.warning('Exception from %s: %s' % (ec2['instance-id'], format_exc()))
         clusto.rollback_transaction()
 
-class BarkerConsumer(object):
-    def __init__(self, queue):
-        self.queue = queue
+class BarkerConsumer(clusto.script_helper.Script):
+    def __init__(self):
+        clusto.script_helper.Script.__init__(self)
+        self.queue = None
 
     def callback(self, body, message):
         if self.queue.qsize() > 500:
@@ -163,7 +165,17 @@ class BarkerConsumer(object):
             return
         self.queue.put(body)
 
-    def __call__(self, hostname):
+    def run(self, args):
+        self.queue = Queue()
+        for hostname in QUEUE_HOSTS:
+            eventlet.spawn_n(self.consumer, hostname)
+
+        while True:
+            body = self.queue.get()
+            log.debug('Queue size %s' % self.queue.qsize())
+            barker_callback(body)
+
+    def consumer(self, hostname):
         exchange = kombu.Exchange(QUEUE_EXCHANGE, type='fanout',
                                   delivery_mode='transient')
         queue = kombu.Queue(QUEUE_NAME, exchange)
@@ -192,19 +204,9 @@ class BarkerConsumer(object):
             if connection:
                 connection.release()
 
-def clusto_updater(queue):
-    while True:
-        body = queue.get()
-        log.debug('Queue size %s' % queue.qsize())
-        barker_callback(body)
-
 def main():
-    init_script()
-    queue = Queue()
-    barker = BarkerConsumer(queue)
-    for hostname in QUEUE_HOSTS:
-        eventlet.spawn_n(barker, hostname)
-    clusto_updater(queue)
+    barker_consumer, args = script_helper.init_arguments(BarkerConsumer)
+    return barker_consumer.run(args)
 
 if __name__ == '__main__':
-	main()
+    sys.exit(main())

@@ -10,8 +10,11 @@ setup(name='clusto-sgext',
         'kombu',
         'eventlet',
         'PyYAML',
-      ], scripts=[
-        'sgext/scripts/clusto-barker-consumer',
-        'sgext/scripts/clusto-puppet-node2',
-        'sgext/scripts/clusto-ec2-report',
-      ])
+      ], 
+      entry_points={
+        'console_scripts': [
+            'clusto-puppet-node2 = sgext.commands.puppet_node2:main',
+            'clusto-barker-consumer = sgext.commands.barker_consumer:main',
+            'clusto-ec2-report = sgext.commands.ec2_report:main',
+        ]
+      })
