@@ -1,3 +1,12 @@
+clusto (0.7.0-1sg84) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Make clusto-info return proper DNS and IPs again
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 25 Aug 2011 21:23:59 +0000
+
 clusto (0.7.0-1sg83) maverick; urgency=low
 
   [ Jeremy Grosser ]
