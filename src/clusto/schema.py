@@ -6,7 +6,7 @@ Clusto schema
 VERSION = 3
 from sqlalchemy import *
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
 
 #from sqlalchemy.ext.sessioncontext import SessionContext
 #from sqlalchemy.ext.assignmapper import assign_mapper
@@ -86,7 +86,7 @@ def latest_version():
 def working_version():
     return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version),1)])
 
-SESSION.clusto_version = working_version()
+SESSION.clusto_version = None
 SESSION.clusto_user = None
 SESSION.clusto_description = None
 
@@ -164,7 +164,7 @@ class Counter(object):
 
     def __init__(self, entity, keyname, start=0):
         self.entity = entity
-        self.attr_key = keyname
+        self.attr_key = unicode(keyname)
 
         self.value = start
 
@@ -182,7 +182,7 @@ class Counter(object):
 
         try:
             ctr = SESSION.query(cls).filter(and_(cls.entity==entity,
-                                                 cls.attr_key==keyname)).one()
+                                                 cls.attr_key==unicode(keyname))).one()
 
         except sqlalchemy.orm.exc.NoResultFound:
             ctr = cls(entity, keyname, default)
@@ -236,10 +236,13 @@ class Attribute(ProtectedObj):
                  subkey=None, number=None):
 
         self.entity = entity
-        self.key = key
+        self.key = unicode(key)
 
         self.value = value
 
+        if subkey is not None:
+            subkey = unicode(subkey)
+            
         self.subkey = subkey
         self.version = working_version()
         if isinstance(number, bool) and number == True:
@@ -361,10 +364,13 @@ class Attribute(ProtectedObj):
                 value = int(value)
             elif self.datatype == 'json':
                 value = json.dumps(value)
-                
-        setattr(self, self.get_value_type(value), value)
-
-
+        
+        value_type = self.get_value_type(value)
+        
+        if value_type == 'string_value' and value is not None:
+            value = unicode(value)
+        
+        setattr(self, value_type, value)
 
     value = property(_get_value, _set_value)
 
@@ -375,19 +381,35 @@ class Attribute(ProtectedObj):
         self.deleted_at_version = working_version()
 
     @classmethod
-    def queryarg(cls, key=None, value=(), subkey=(), number=()):
+    def _version_args(cls):
+        args = []
+        del_version_args = [cls.deleted_at_version==None]
+        if SESSION.clusto_version != None:
+          del_version_args.append(cls.deleted_at_version>SESSION.clusto_version)
+          args.append(cls.version<=SESSION.clusto_version)
 
-        args = [or_(cls.deleted_at_version==None,
-                    cls.deleted_at_version>SESSION.clusto_version),
-                cls.version<=SESSION.clusto_version]
+
+        if len(del_version_args) > 1:
+          args.append(or_(*del_version_args))
+        else:
+          args.append(*del_version_args)
+
+        return args
+
+    @classmethod
+    def queryarg(cls, key=None, value=(), subkey=(), number=()):
+        args = cls._version_args()
 
         if key:
-            args.append(Attribute.key==key)
+            args.append(Attribute.key==unicode(key))
 
         if number is not ():
             args.append(Attribute.number==number)
 
         if subkey is not ():
+            if subkey is not None:
+                subkey = unicode(subkey)
+        
             args.append(Attribute.subkey==subkey)
 
         if value is not ():
@@ -401,7 +423,11 @@ class Attribute(ProtectedObj):
                     e = value
 
                 args.append(getattr(Attribute, 'relation_id') == e.entity_id)
-
+            elif valtype == 'string_value':
+                if value is not None:
+                    value = unicode(value)
+                    
+                args.append(getattr(Attribute, 'string_value') == value)
             else:
                 args.append(getattr(Attribute, valtype) == value)
 
@@ -409,8 +435,9 @@ class Attribute(ProtectedObj):
 
     @classmethod
     def query(cls):
-        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
-                                             cls.deleted_at_version>SESSION.clusto_version)).filter(cls.version<=SESSION.clusto_version)
+        args = cls._version_args()
+
+        return SESSION.query(cls).filter(and_(*args))
 
 class Entity(ProtectedObj):
     """
@@ -432,7 +459,7 @@ class Entity(ProtectedObj):
         @type attrslist: C{list} of C{tuple}s of length 2
         """
 
-        self.name = name
+        self.name = unicode(name)
 
         self.driver = driver
         self.type = clustotype
@@ -479,17 +506,11 @@ class Entity(ProtectedObj):
 
     @property
     def attrs(self):
-        return Attribute.query().filter(and_(Attribute.entity==self,
-                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
-                                                      ATTR_TABLE.c.deleted_at_version==None),
-                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
+        return Attribute.query().filter(Attribute.entity==self).all()
 
     @property
     def references(self):
-        return Attribute.query().filter(and_(Attribute.relation_id==self.entity_id,
-                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
-                                                      ATTR_TABLE.c.deleted_at_version==None),
-                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
+        return Attribute.query().filter(Attribute.relation_id==self.entity_id).all()
 
 
     def add_attr(self, *args, **kwargs):
@@ -516,9 +537,19 @@ class Entity(ProtectedObj):
             raise x
 
     @classmethod
+    def _version_args(cls):
+        args = []
+        del_version_args = [cls.deleted_at_version==None]
+        if SESSION.clusto_version != None:
+          del_version_args.append(cls.deleted_at_version>SESSION.clusto_version)
+          args.append(cls.version<=SESSION.clusto_version)
+
+        args.append(or_(*del_version_args))
+        return args
+
+    @classmethod
     def query(cls):
-        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
-                                             cls.deleted_at_version>SESSION.clusto_version)).filter(cls.version<=SESSION.clusto_version)
+        return SESSION.query(cls).filter(and_(*cls._version_args()))
 
 
     @ProtectedObj.writer

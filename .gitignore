@@ -1,8 +1,10 @@
 *.pyc
 *~
+*.swp
+*.db
 build
 dist
-src/clusto.egg-info
+*.egg-info
 doc/.build
 rpm/*.tar.gz
 env/
