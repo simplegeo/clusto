@@ -33,7 +33,7 @@ class Reboot(script_helper.Script):
             self.error('"%s" does not exist' % args.object[0])
             return -1
         obj = obj[0]
-        if not hasattr(obj, 'reboot')
+        if not hasattr(obj, 'reboot'):
             self.error('"%s" does not have a reboot() method.')
             return 1
         self.debug('Rebooting %s' % obj)
