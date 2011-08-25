@@ -1,3 +1,9 @@
+clusto (0.7.0-1sg76) maverick; urgency=low
+
+  * Major version bump
+
+ -- Jeremy Grosser <jeremy@synack.me>  Thu, 25 Aug 2011 17:49:07 +0000
+
 clusto (0.5.32-4sg75) maverick; urgency=low
 
   * UNRELEASED
