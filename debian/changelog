@@ -1,3 +1,348 @@
+clusto (0.5.32-4sg74) maverick; urgency=low
+
+  [ Jorge A Gallegos ]
+  * Taking advantage of argparse magic.  - The setup.py script has been
+    reworked a bit  - Ported clusto-shell to the new style  - The
+    clusto.script module serves as a frontend for all    available
+    commands
+  * Just adding a kwarg
+  * Some environment variables.  - Use CLUSTOCONFIG if available,
+    otherwise use --config    (which defaults to
+    /etc/clusto/clusto.conf)  - Use CLUSTODSN if set, which in turn gets
+    overwritten    by --dsn if provided
+  * Updated setup.py to Ron's current email address
+  * Some cleanup wrt scripts.  - Got rid of clustoScript.py (which I
+    believe was r0n's attempt to do    what I did)  - Got rid of
+    scripthelpers.py (since I'll be porting the rest of the    scripts
+    to the new style)  - Renamed script.py to script_helper.py, makes a
+    bit more sense
+  * Two changes, one cosmetic the other functional:  - Renamed
+    setup_parser to setup_base_parser, makes sense  - Use add_subparser
+    now instead of calling _setup_subparser directly
+  * Better wording, variables are a bit more explicit
+  * Adding clusto-info script
+  * Adding vim swap files to gitignore
+  * Changes to the clusto frontend:  - Adding doc strings  - Account for
+    commands with underscores to be translated to slashes  - Commands
+    are now read from the FS items, not from __all__, this    so we can
+    split commands in packages later without the need to    update the
+    commands/__init__.py file
+  * We don't need __all__ anymore
+  * Forgot I moved these to src/clusto/commands
+  * Adding *.db to .gitignore
+  * Adding the clusto-pool command
+  * Two changes to script_helper to deal with _ and -:  - The
+    command_name should be taken from the module name, not the class  -
+    On the way back, demodule() should be called to make up for the
+    previous underscore/dash replacing
+  * Adding the list-pool command
+  * chmod +x shell.py
+  * You don't need glob
+  * Adding json and yaml output options
+  * Adding support to include other files in config
+  * Adding clusto-attr and making setup.py behave
+  * Forgot indentation mode
+  * Add support for get_conf default
+  * Removing unnecessary config parsing
+  * clusto-fai
+  * FAI Defaults to No
+  * Ported clusto-reboot. Happy birthday to me.
+  * Adding assert_driver to get_by_name
+  * I think allocate is mostly done
+  * Ported clusto-console, got rid of digg stuff
+  * Finished puppet-node, got rid of digg sauce
+  * Coerce values to be unicode objects
+  * Added some debugging/info lines
+
+  [ Lex Linden ]
+  * Remove python-sqlalchemy from build-depends.  It's not necessary to
+    build clusto (only to test it).
+  * Only need python-sqlite (>= 0.6.3), not (>= 0.6.4).
+  * python-sqlite and python-memcache are not strictly required except
+    to run tests, so make them recommends
+
+  [ Warren Turkal ]
+  * Improve error message for clusto-dancer. Signed-off-by: Warren
+    Turkal <wt@digg.com>
+
+  [ Jeremy Grosser ]
+  * clusto-http: Remove non-json responses, fix content types, simplify
+    dumps method
+  * Get rid of annoying XenVirtualServer
+  * Add missing dependencies to setup.py
+
+  [ Ron Gorodetzky ]
+  * add docstring to get_by_name
+  * implement get_by_names
+  * minor doc and whitespace cleanups
+  * add support for storing jsonable data
+  * add get_resource_manager method to ResourceManager plus whitespace
+    cleanups
+  * remove dependency on BasicServer and BasicVirtualServer from
+    VMManager
+  * initial EC2 support with very basic documentation
+  * handle default us-east-1 region and explicit us-east-1 regions
+    separately
+  * add console support for EC2VirtualServer
+  * make default ec2_region "default:us-east-1"
+  * check parents when checking ec2_allow_termination
+  * add security_group support
+  * add separate additional attrs for ec2 resources for quicker lookups
+  * remove difference between default:us-east-1 and us-east-1.  Both
+    will use the default connection.
+  * pass aws auth info when connecting to other regions
+  * set number when setting additional_attrs in EC2VMManager
+  * cleanup ipmanager ipy to int conversation
+  * initial implementation of EC2IPManager
+  * add IPMixin to BasicVirtualServer
+  * update ipmanager
+  * if merge_container_attrs is true then attr_value should return the
+    value closest to _this_ thing
+  * add real IP support to ec2virtualserver and initial metadata
+    functions
+  * clear ec2server metadata when deallocating its resources
+  * make ec2_user_data a mako template so clusto data (only entity name
+    now) can be replaced
+  * update packaging to depend on boto and mako
+  * update ec2ipmanager ip list
+  * fix ResourceTypeException import
+  * fix conversion/storage of ip value in ec2ipmanager
+  * fix updating reserved ip list from ec2 and ip allocation
+  * make get_ip_manager work with any ipmanager type
+  * add post_automatic_allocation and post_allocation hooks to
+    ResourceManager
+  * move EC2IPManager use_ip setup and update_metadata to allocation
+    hooks
+  * fix post_*allocation calls
+  * add clusto-puppet-node2 command
+  * let get_or_create take **kwargs
+  * fix locations __init__ files
+  * add EC2Region as a datacenter type
+  * add basic zone object and EC2Zone driver
+  * add ec2 helper to create all ec2 objects
+  * add update_metadata to base Driver
+  * allow ec2virtualserver.update_metadata to wait until
+    state=='running'
+  * add region to userdata template dictionary
+  * fix ec2virtualserver update_metadata to run at least once when
+    wait=False
+  * update ec2 ip ranges
+  * add t1.micro instance type
+  * add data to puppet-node2
+  * add an underscore test
+  * change hidden attr escape char to @
+  * allow deallocation even if instance already doesn't exist
+
+  [ Jeremy Grosser ]
+  * Barker and packaging patches
+  * Set source format
+
+  [ Simple Geebus ]
+
+  [ Jeremy Grosser ]
+  * Install clusto-barker-consumer
+
+  [ Simple Geebus ]
+
+  [ Jeremy Grosser ]
+  * Depend on webob for clusto-httpd
+  * Fix http json.loads
+  * Add system.os
+
+  [ Simple Geebus ]
+
+  [ Jeremy Grosser ]
+  * Remove simplegeo changelog entries
+  * Revert simplegeo's changes to static web interface
+
+  [ Jorge A Gallegos ]
+  * Debian bump
+  * Small changes, still trying to figure out things
+
+  [ Lex Linden ]
+  * Added iteration support for Drivers.
+
+  [ Jorge A Gallegos ]
+  * I wasn't returning the exit code here
+  * Ported deallocate
+  * Some cosmetic changes, require sqla >= 0.6.3
+  * Added missing srcdir variable
+  * Fuck boilerplate, init_arguments() does all that
+
+  [ Joshua Tobin ]
+  * Fixing typo in portmixin.py
+
+  [ Jorge A Gallegos ]
+  * Sorry 'bout that
+
+  [ Joshua Tobin ]
+  * Adding functionality to basicrack.py to allow devices other than
+    Device to be inserted into a rack
+  * Bug fix in basicrack.py
+  * Really fixing basicrack.py this time
+
+  [ Dynamike Linden ]
+  * * Have specific exceptions for noninteger port numbers and port
+    numbers less than 1.
+
+  [ Lex Linden ]
+  * Driver.__new__ should not require a name, driver, or entity
+    parameter to be passed.  Let the subclass decide for itself if it
+    wants to require this.
+  * Driver.__new__ should allow any number of arguments to be passed to
+    a subclass's constructor.
+  * Don't re-raise exceptions; allow existing exception to propagate up
+    so that the caller can more easily debug.
+  * Eradicated (hopefully) this warning:   SAWarning: Unicode type
+    received non-unicode bind param value This was caused by feeding
+    non-unicode values to columns marked as 'convert_unicode'.
+    SQLAlchemy requires that you give it a unicode value for these
+    columns, and for values tested against these columns (e.g. = and
+    LIKE tests).  Most code should now work unmodified and avoid the
+    warning, but anything that does direct sqlalchemy queries will need
+    to be carefully written to ensure unicode values are passed. Also,
+    changed a 'except x: raise x' to just use 'raise' because the former
+    blows away the useful stack trace.
+  * Darnit.  Missed a case where I could end up storing u'None' instead
+    of None.
+
+  [ Michael Kania ]
+  * * Adde timestamp functionality to do_attr_query
+
+  [ Jorge A Gallegos ]
+  * s/Manger/Manager/ I got you, Ron. Finally.
+  * Turns out is not Zip Safe after all
+  * Adding support for tagging/naming instances. This patch requires a
+    newer version of boto, which I'm not sure all distros out there have
+    it yet.
+  * Updating list of amazon IPs
+  * Adding EC2IPManager to the ec2 helper
+  * Updating list of amazon IPs
+  * Adding EC2IPManager to the ec2 helper
+  * sqlalchemy.exceptions are actually sqlalchemy.exc. This change it's
+    been in sqlalchemy for quite a while, but the alias got dropped in
+    recent sqla versions, which usually pop up when developing on a
+    virtualenv. I tested with 0.7.1 (pip latest), 0.6.8 (system-wide
+    install) and 0.5.4 (pip install while forcing version). All of them
+    work.
+  * sqlalchemy.exceptions are actually sqlalchemy.exc. This change it's
+    been in sqlalchemy for quite a while, but the alias got dropped in
+    recent sqla versions, which usually pop up when developing on a
+    virtualenv. I tested with 0.7.1 (pip latest), 0.6.8 (system-wide
+    install) and 0.5.4 (pip install while forcing version). All of them
+    work.
+  * Fixing sqlalchemy versioning
+
+  [ Ron Gorodetzky ]
+  * clean up sql for the common case of querying against the current
+    version
+  * clear transaction counter when clearing session
+  * Raise exception when doing a rollback when no transaction was
+    started.
+  * clean up sql for the common case of querying against the current
+    version
+  * clear transaction counter when clearing session
+  * Raise exception when doing a rollback when no transaction was
+    started.
+
+  [ Jorge A Gallegos ]
+  * Adding support for tagging/naming instances. This patch requires a
+    newer version of boto, which I'm not sure all distros out there have
+    it yet.
+  * Fixing sqlalchemy versioning
+  * Fixed init_script in commands of the form clusto-*
+  * A little bit of sugar added to clusto-shell: This allows for basic
+    "batch mode" in clusto shell, meaning:  - you can pipe a script to
+    clusto shell (cat script.py | clusto-shell)  - you can redirect a
+    script to clusto shell (clusto-shell < script.py) My original goal
+    was to be able to use clusto-shell as the interpreter in a script
+    (ala #!/usr/bin/env clusto-shell) but the IPython people explicitly
+    prohibit cmd line execution in embedded shells as stated in
+    IPython/ipmaker.py ~703: """ Do NOT execute files named in the
+    command line as scripts to be loaded by embedded instances.  Doing
+    so has the potential for an infinite recursion if there are
+    exceptions thrown in the process. """ Bummer. Some considerations
+    when writing scripts to use in clusto-shell:  - this behaves as
+    normal ipython program, i.e. get_entities() will    print the list
+    even if no explicit `print` call is added  - scripts must end with a
+    newline, this becase ipython does "guessing"    when writing code
+    interactively. Think how you do for loops in    ipython
+  * Fixed init_script in commands of the form clusto-*
+  * A little bit of sugar added to clusto-shell: This allows for basic
+    "batch mode" in clusto shell, meaning:  - you can pipe a script to
+    clusto shell (cat script.py | clusto-shell)  - you can redirect a
+    script to clusto shell (clusto-shell < script.py) My original goal
+    was to be able to use clusto-shell as the interpreter in a script
+    (ala #!/usr/bin/env clusto-shell) but the IPython people explicitly
+    prohibit cmd line execution in embedded shells as stated in
+    IPython/ipmaker.py ~703: """ Do NOT execute files named in the
+    command line as scripts to be loaded by embedded instances.  Doing
+    so has the potential for an infinite recursion if there are
+    exceptions thrown in the process. """ Bummer. Some considerations
+    when writing scripts to use in clusto-shell:  - this behaves as
+    normal ipython program, i.e. get_entities() will    print the list
+    even if no explicit `print` call is added  - scripts must end with a
+    newline, this becase ipython does "guessing"    when writing code
+    interactively. Think how you do for loops in    ipython
+  * Popular demand: make it easier to write messy code. I took
+    load_config() out of the Script class, as a function, this makes it
+    possible to do this in any given script: """ import clusto from
+    clusto import script_helper conf =
+    script_helper.load_config('/etc/clusto/clusto.conf')
+    clusto.connect(conf) print clusto.get_entities() """ You don't get
+    any of the fancy things you get when subclassing Script like
+    logging, get_conf(), etc. but at the same time this makes it dead
+    easy to import clusto in your app/script and start hacking.
+  * Fixing sqlalchemy versioning
+  * Boto 2.0 has been released
+  * Updating IP ranges for ec2
+
+  [ Jeremy Grosser ]
+  * Minimal build of clusto with only core implementations
+  * Make tests pass with no extended drivers
+  * Move digg drivers into a separate package as an example of how to
+    extend clusto
+  * Re-adding EC2 support in the form of the clustoec2 extension
+  * Fix clustoec2 README
+  * Pull clusto-httpd back in
+  * Re-integrate clusto-httpd
+  * Re-add dhcp/snmp stuff
+
+  [ Jorge A Gallegos ]
+  * clusto-shell doesn't work with ipython 0.11 yet
+
+  [ Jeremy Grosser ]
+  * Support importing plugins with CLUSTOPLUGINS environment variable or
+    plugins option in clusto.conf
+  * Make clusto-reboot a bit more generic
+  * Begin fleshing out sgext
+  * Fleshing out sgext a bit more
+  * Ignore all egg-info files
+  * Start fleshing out sgext
+  * Add more opsd methods
+  * Finish implementing opsd v0 methods
+  * Remove sg-shell now that we have CLUSTOPLUGINS
+  * values -> attrs
+  * Create a clusto-initdb command, subclass ec2region and ec2zone
+    correctly, move clusto-httpd over to argparse and stop using
+    clusto.services.config
+  * Add clusto-ec2-report and clusto-puppet-node2 back in for
+    compatibility
+  * clusto -> config
+  * Add barker-consumer
+  * Move scripts to sgext
+  * setup.py typo and fixup
+  * Post-merge cleanup
+  * Remove ec2 helpers
+  * Remove pointless imports
+  * Make clusto-info work the way I want it to
+  * Make sgext commands more like core commands
+  * Use script_helper.Script for ec2_report and puppet_node2
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 25 Aug 2011 17:38:49 +0000
+
 clusto (0.5.32-4sg73) maverick; urgency=low
 
   [ Paul Lathrop ]
