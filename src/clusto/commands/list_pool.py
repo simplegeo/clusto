@@ -5,7 +5,7 @@ import clusto
 import sys
 
 
-class ListPool(script_helper.Shell):
+class ListPool(script_helper.Script):
     def _add_arguments(self, parser):
         parser.add_argument("-k", "--key", default='ip')
         parser.add_argument("-s", "--subkey", default='ipstring')
