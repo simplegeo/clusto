@@ -1,3 +1,12 @@
+clusto (0.7.0-1sg79) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * CSV means comma
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 25 Aug 2011 18:50:21 +0000
+
 clusto (0.7.0-1sg78) maverick; urgency=low
 
   [ Jeremy Grosser ]
