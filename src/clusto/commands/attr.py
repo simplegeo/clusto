@@ -120,6 +120,8 @@ class Attr(script_helper.Script):
         opts = {}
         kwargs = dict(args.__dict__.items())
         self.format = args.format
+        if args.csv:
+            self.format = 'csv'
         for k in ['key', 'subkey', 'value', 'merge_container_attrs']:
             if kwargs[k] != None:
                 opts[k] = kwargs[k]
@@ -145,6 +147,7 @@ class Attr(script_helper.Script):
         parser.add_argument('-m', '--merge', default=False, action='store_true',
             dest='merge_container_attrs',
             help='Merge container attributes recursively (defaults to False)')
+        parser.add_argument('-c', '--csv', action='store_true', help='CSV format')
         parser.add_argument('obj', nargs=1, metavar='object',
             help='Object to modify/query attributes from')
 
