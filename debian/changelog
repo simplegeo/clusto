@@ -1,3 +1,12 @@
+clusto (0.7.0-1sg82) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Depend on newer python-sqlalchemy
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 25 Aug 2011 19:30:59 +0000
+
 clusto (0.7.0-1sg81) maverick; urgency=low
 
   [ Jeremy Grosser ]
