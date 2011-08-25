@@ -1,3 +1,12 @@
+clusto (0.7.0-1sg78) maverick; urgency=low
+
+  [ Jeremy Grosser ]
+  * Dirty hack to restore old functionality
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 25 Aug 2011 18:47:57 +0000
+
 clusto (0.7.0-1sg77) maverick; urgency=low
 
   * UNRELEASED
