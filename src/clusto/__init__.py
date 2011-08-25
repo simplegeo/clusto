@@ -265,6 +265,16 @@ def get_by_serial(serial):
         'value': serial,
     }])
 
+def get_by_ip(ip):
+    try:
+        return IPManager.get_devices(ip)
+    except:
+        return get_entities(attrs=[{
+            'key': 'ip',
+            'subkey': 'ipstring',
+            'value': ip
+        }])
+
 def get(term):
     if not isinstance(term, basestring):
         raise ValueError('get(term) must be a string')
@@ -276,7 +286,7 @@ def get(term):
 
     patterns = [
         ('^(?P<serial>P[0-9]{10})$', get_by_serial, 0),
-        ('^(?P<ip>([0-9]{1,3}(\.|$)){4})$', IPManager.get_devices, 0),
+        ('^(?P<ip>([0-9]{1,3}(\.|$)){4})$', get_by_ip, 0),
         ('^(?P<mac>([0-9a-f]{1,2}([:-]|$)){6})$', get_by_mac, re.IGNORECASE),
     ]
 
