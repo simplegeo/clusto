@@ -57,9 +57,9 @@ class Attr(script_helper.Script):
 
     def run_show_csv(self, attrs):
         self.debug('Printing in format: CSV')
-        print 'key;subkey;number;"value"'
+        #print 'key,subkey,number,value'
         for attr in attrs:
-            print '%s;%s;%s;"%s"' % (
+            print '%s,%s,%s,%s' % (
                 str(attr['key'] or ''),
                 str(attr['subkey'] or ''),
                 str(int(attr['number'] or 0)),
