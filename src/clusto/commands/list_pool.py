@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-from clusto import script_helpers
+from clusto import script_helper
 import clusto
 
 import sys
 
 
-class ListPool(script_helpers.Shell):
+class ListPool(script_helper.Script):
     def _add_arguments(self, parser):
         parser.add_argument("-k", "--key", default='ip')
         parser.add_argument("-s", "--subkey", default='ipstring')
