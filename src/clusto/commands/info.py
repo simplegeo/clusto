@@ -7,7 +7,6 @@ import re
 import sys
 
 import clusto
-from clusto.drivers import IPManager
 from clusto import script_helper
 
 JSON=False
@@ -78,9 +77,9 @@ class Info(script_helper.Script):
             
             sys.stdout.write('\n')
 
-            self.print_line('IP', x.attr_values(key='ip', subkey='ipstring'))
-            self.print_line('Public DNS', x.attr_values(key='ec2', subkey='public-dns'))
-            self.print_line('Private DNS', x.attr_values(key='ec2', subkey='private-dns'))
+            self.print_line('IP', obj.attr_values(key='ip', subkey='ipstring'))
+            self.print_line('Public DNS', obj.attr_values(key='ec2', subkey='public-dns'))
+            self.print_line('Private DNS', obj.attr_values(key='ec2', subkey='private-dns'))
 
             sys.stdout.write('\n')
 
