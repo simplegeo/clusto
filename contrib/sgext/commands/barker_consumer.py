@@ -67,15 +67,14 @@ def barker_callback(body):
         for i,group in enumerate(sorted(ec2['security-groups'])):
             server.set_attr(key='ec2', subkey='security-group', number=i, value=group)
             if group.find('_') != -1:
-                environment, role = group.lower().split('_', 1)
+                environment, _ = group.lower().split('_', 1)
+
+                # Going to pull the 'environment' pool type
+                # from the SGs because we do not want to allow
+                # servers to go from staging to production.
                 p = clusto.get_or_create(environment, Pool)
                 if not p.attrs(key='pooltype', value='environment'):
                     p.set_attr(key='pooltype', value='environment')
-                if not server in p:
-                    p.insert(server)
-                p = clusto.get_or_create(role, Pool)
-                if not p.attrs(key='pooltype', value='role'):
-                    p.set_attr(key='pooltype', value='role')
                 if not server in p:
                     p.insert(server)
 
