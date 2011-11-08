@@ -67,7 +67,7 @@ def barker_callback(body):
         for i,group in enumerate(sorted(ec2['security-groups'])):
             server.set_attr(key='ec2', subkey='security-group', number=i, value=group)
             if group.find('_') != -1:
-                environment, _ = group.lower().split('_', 1)
+                environment = group.lower().split('_', 1)[0]
 
                 # Going to pull the 'environment' pool type
                 # from the SGs because we do not want to allow
@@ -129,10 +129,17 @@ def barker_callback(body):
                     cluster.set_attr(key='pooltype', value='clusterid')
                 if not server in cluster:
                     cluster.insert(server)
+
             if subkey == 'role' and value:
                 if len(server.attr_values(key='puppet', subkey='class')) == 0:
                     server.set_attr(key='puppet', subkey='class',
                                     value='site::role::%s' % value)
+
+                cluster = clusto.get_or_create(value, Pool)
+                if not cluster.attrs(key='pooltype', value='role'):
+                    cluster_set_attrs(key='pooltype', value='role')
+                if not server in cluster:
+                    cluster.insert(server)
 
         if len(server.attr_values(key='puppet', subkey='class')) == 0:
             log.warning('Found host %s with no role set, using site::role::base' % ec2['instance-id'])
