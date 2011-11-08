@@ -1,3 +1,16 @@
+clusto (0.7.0-1sg87) maverick; urgency=low
+
+  [ Derek Smith ]
+  * All the role pooltype to be specified by the sgmetadata dict
+  * Remove the "_" variable. Make sure that the role pooltype is still
+    being set from sgmetadata
+  * s/_/./
+  * should be set_attr instead of set_attrs
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Tue, 08 Nov 2011 19:18:42 +0000
+
 clusto (0.7.0-1sg86) maverick; urgency=low
 
   [ Jeremy Grosser ]
