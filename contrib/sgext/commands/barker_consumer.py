@@ -137,7 +137,7 @@ def barker_callback(body):
 
                 cluster = clusto.get_or_create(value, Pool)
                 if not cluster.attrs(key='pooltype', value='role'):
-                    cluster.set_attrs(key='pooltype', value='role')
+                    cluster.set_attr(key='pooltype', value='role')
                 if not server in cluster:
                     cluster.insert(server)
 
